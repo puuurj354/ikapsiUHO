@@ -1,4 +1,5 @@
 import { Icon } from '@/components/icon';
+import { ProfileUpdateModal } from '@/components/profile-update-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +24,7 @@ import {
     User,
     Users,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface UserProfile {
     name: string;
@@ -74,6 +76,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard({ dashboardData }: DashboardProps) {
     const { user_profile, statistics, recent_alumni, alumni_by_year } =
         dashboardData;
+
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     const statCards = [
         {
@@ -199,7 +203,11 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                                     Update Profil
                                 </Button>
                             </Link>
-                            <Button variant="outline" size="sm">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsProfileModalOpen(true)}
+                            >
                                 <BookOpen className="mr-2 h-4 w-4" />
                                 Lengkapi Data
                             </Button>
@@ -405,6 +413,16 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                         </div>
                     </CardContent>
                 </Card>
+
+                <ProfileUpdateModal
+                    open={isProfileModalOpen}
+                    onOpenChange={setIsProfileModalOpen}
+                    currentData={{
+                        angkatan: user_profile.angkatan,
+                        profesi: user_profile.profesi,
+                        bio: user_profile.bio,
+                    }}
+                />
             </div>
         </AppLayout>
     );
