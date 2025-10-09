@@ -220,15 +220,65 @@ export default function UserManagement({ users, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manajemen Pengguna" />
 
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            Manajemen Pengguna
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Kelola data pengguna dan hak akses sistem
-                        </p>
+            <div className="container mx-auto space-y-8 py-8">
+                {/* Header */}
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Manajemen Pengguna
+                    </h1>
+                    <p className="mt-2 text-muted-foreground">
+                        Kelola data pengguna dan hak akses sistem
+                    </p>
+                </div>
+
+                {/* Filters and Actions */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-1 gap-4">
+                        <div className="flex-1">
+                            <Input
+                                placeholder="Cari nama atau email..."
+                                value={searchValue}
+                                onChange={(e) => handleSearch(e.target.value)}
+                            />
+                        </div>
+                        <Select
+                            value={roleFilter}
+                            onValueChange={(value) =>
+                                handleFilterChange('role', value)
+                            }
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Semua Role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Semua Role</SelectItem>
+                                <SelectItem value="ADMIN">Admin</SelectItem>
+                                <SelectItem value="ALUMNI">Alumni</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select
+                            value={angkatanFilter}
+                            onValueChange={(value) =>
+                                handleFilterChange('angkatan', value)
+                            }
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Semua Angkatan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    Semua Angkatan
+                                </SelectItem>
+                                {angkatanOptions.map((year) => (
+                                    <SelectItem
+                                        key={year}
+                                        value={year.toString()}
+                                    >
+                                        Angkatan {year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <Button onClick={() => setIsCreateDialogOpen(true)}>
                         <Icon
@@ -237,50 +287,6 @@ export default function UserManagement({ users, filters }: Props) {
                         />
                         Tambah Pengguna
                     </Button>
-                </div>
-
-                {/* Filters */}
-                <div className="flex gap-4">
-                    <div className="flex-1">
-                        <Input
-                            placeholder="Cari nama atau email..."
-                            value={searchValue}
-                            onChange={(e) => handleSearch(e.target.value)}
-                        />
-                    </div>
-                    <Select
-                        value={roleFilter}
-                        onValueChange={(value) =>
-                            handleFilterChange('role', value)
-                        }
-                    >
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Semua Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Semua Role</SelectItem>
-                            <SelectItem value="ADMIN">Admin</SelectItem>
-                            <SelectItem value="ALUMNI">Alumni</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Select
-                        value={angkatanFilter}
-                        onValueChange={(value) =>
-                            handleFilterChange('angkatan', value)
-                        }
-                    >
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Semua Angkatan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Semua Angkatan</SelectItem>
-                            {angkatanOptions.map((year) => (
-                                <SelectItem key={year} value={year.toString()}>
-                                    Angkatan {year}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
                 </div>
 
                 {/* Users Table */}
