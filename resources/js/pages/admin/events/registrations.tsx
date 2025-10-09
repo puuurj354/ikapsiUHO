@@ -1,6 +1,6 @@
 import { Icon } from '@/components/icon';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -26,8 +26,12 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { ArrowLeftIcon, CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
-import React from 'react';
+import {
+    ArrowLeftIcon,
+    CalendarIcon,
+    MapPinIcon,
+    UsersIcon,
+} from 'lucide-react';
 
 interface Event {
     id: number;
@@ -69,9 +73,15 @@ export default function EventRegistrations({ event, registrations }: Props) {
     ];
 
     // Count registrations by status
-    const registeredCount = registrations.filter((r) => r.status === 'registered').length;
-    const attendedCount = registrations.filter((r) => r.status === 'attended').length;
-    const cancelledCount = registrations.filter((r) => r.status === 'cancelled').length;
+    const registeredCount = registrations.filter(
+        (r) => r.status === 'registered',
+    ).length;
+    const attendedCount = registrations.filter(
+        (r) => r.status === 'attended',
+    ).length;
+    const cancelledCount = registrations.filter(
+        (r) => r.status === 'cancelled',
+    ).length;
 
     // Format date for display
     const formatDate = (dateString: string) => {
@@ -85,19 +95,23 @@ export default function EventRegistrations({ event, registrations }: Props) {
     };
 
     // Handle status change
-    const handleStatusChange = (registrationId: number, userId: number, newStatus: string) => {
+    const handleStatusChange = (
+        registrationId: number,
+        userId: number,
+        newStatus: string,
+    ) => {
         router.patch(
             `/admin/events/${event.id}/registrations/${userId}`,
             { status: newStatus },
             {
                 preserveScroll: true,
-            }
+            },
         );
     };
 
     // Get badge variant for status
     const getStatusBadgeVariant = (
-        status: string
+        status: string,
     ): 'default' | 'secondary' | 'destructive' | 'outline' => {
         switch (status) {
             case 'registered':
@@ -133,7 +147,10 @@ export default function EventRegistrations({ event, registrations }: Props) {
                 {/* Back Button */}
                 <Button variant="ghost" asChild>
                     <a href="/admin/events">
-                        <Icon iconNode={ArrowLeftIcon} className="mr-2 h-4 w-4" />
+                        <Icon
+                            iconNode={ArrowLeftIcon}
+                            className="mr-2 h-4 w-4"
+                        />
                         Kembali ke Daftar Event
                     </a>
                 </Button>
@@ -152,10 +169,18 @@ export default function EventRegistrations({ event, registrations }: Props) {
                     <CardHeader>
                         <div className="flex items-start justify-between">
                             <div className="space-y-2">
-                                <CardTitle className="text-2xl">{event.title}</CardTitle>
-                                <CardDescription>{event.description}</CardDescription>
+                                <CardTitle className="text-2xl">
+                                    {event.title}
+                                </CardTitle>
+                                <CardDescription>
+                                    {event.description}
+                                </CardDescription>
                             </div>
-                            <Badge variant={event.is_published ? 'default' : 'secondary'}>
+                            <Badge
+                                variant={
+                                    event.is_published ? 'default' : 'secondary'
+                                }
+                            >
                                 {event.is_published ? 'Published' : 'Draft'}
                             </Badge>
                         </div>
@@ -163,23 +188,39 @@ export default function EventRegistrations({ event, registrations }: Props) {
                     <CardContent className="space-y-3">
                         <div className="grid gap-3 sm:grid-cols-2">
                             <div className="flex items-center gap-2 text-sm">
-                                <Icon iconNode={CalendarIcon} className="h-4 w-4 text-muted-foreground" />
+                                <Icon
+                                    iconNode={CalendarIcon}
+                                    className="h-4 w-4 text-muted-foreground"
+                                />
                                 <span>{formatDate(event.event_date)}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm">
-                                <Icon iconNode={MapPinIcon} className="h-4 w-4 text-muted-foreground" />
+                                <Icon
+                                    iconNode={MapPinIcon}
+                                    className="h-4 w-4 text-muted-foreground"
+                                />
                                 <span>{event.location}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm">
-                                <Icon iconNode={UsersIcon} className="h-4 w-4 text-muted-foreground" />
+                                <Icon
+                                    iconNode={UsersIcon}
+                                    className="h-4 w-4 text-muted-foreground"
+                                />
                                 <span>
                                     {registrations.length} pendaftar
-                                    {event.max_participants && ` / ${event.max_participants} max`}
+                                    {event.max_participants &&
+                                        ` / ${event.max_participants} max`}
                                 </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm">
-                                <Icon iconNode={CalendarIcon} className="h-4 w-4 text-muted-foreground" />
-                                <span>Batas: {formatDate(event.registration_deadline)}</span>
+                                <Icon
+                                    iconNode={CalendarIcon}
+                                    className="h-4 w-4 text-muted-foreground"
+                                />
+                                <span>
+                                    Batas:{' '}
+                                    {formatDate(event.registration_deadline)}
+                                </span>
                             </div>
                         </div>
                     </CardContent>
@@ -189,26 +230,38 @@ export default function EventRegistrations({ event, registrations }: Props) {
                 <div className="grid gap-4 sm:grid-cols-3">
                     <Card>
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium">Terdaftar</CardTitle>
+                            <CardTitle className="text-sm font-medium">
+                                Terdaftar
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{registeredCount}</div>
+                            <div className="text-2xl font-bold">
+                                {registeredCount}
+                            </div>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium">Hadir</CardTitle>
+                            <CardTitle className="text-sm font-medium">
+                                Hadir
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{attendedCount}</div>
+                            <div className="text-2xl font-bold">
+                                {attendedCount}
+                            </div>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-medium">Dibatalkan</CardTitle>
+                            <CardTitle className="text-sm font-medium">
+                                Dibatalkan
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{cancelledCount}</div>
+                            <div className="text-2xl font-bold">
+                                {cancelledCount}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -239,7 +292,9 @@ export default function EventRegistrations({ event, registrations }: Props) {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead className="w-[80px]">Foto</TableHead>
+                                            <TableHead className="w-[80px]">
+                                                Foto
+                                            </TableHead>
                                             <TableHead>Nama</TableHead>
                                             <TableHead>Email</TableHead>
                                             <TableHead>Angkatan</TableHead>
@@ -253,38 +308,55 @@ export default function EventRegistrations({ event, registrations }: Props) {
                                             <TableRow key={registration.id}>
                                                 <TableCell>
                                                     <img
-                                                        src={registration.user.profile_picture_url}
-                                                        alt={registration.user.name}
+                                                        src={
+                                                            registration.user
+                                                                .profile_picture_url
+                                                        }
+                                                        alt={
+                                                            registration.user
+                                                                .name
+                                                        }
                                                         className="h-10 w-10 rounded-full object-cover"
                                                     />
                                                 </TableCell>
                                                 <TableCell className="font-medium">
                                                     {registration.user.name}
                                                 </TableCell>
-                                                <TableCell>{registration.user.email}</TableCell>
                                                 <TableCell>
-                                                    {registration.user.angkatan || '-'}
+                                                    {registration.user.email}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {registration.user.profesi || '-'}
+                                                    {registration.user
+                                                        .angkatan || '-'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {registration.user
+                                                        .profesi || '-'}
                                                 </TableCell>
                                                 <TableCell>
                                                     {new Date(
-                                                        registration.registered_at
-                                                    ).toLocaleDateString('id-ID', {
-                                                        day: 'numeric',
-                                                        month: 'short',
-                                                        year: 'numeric',
-                                                    })}
+                                                        registration.registered_at,
+                                                    ).toLocaleDateString(
+                                                        'id-ID',
+                                                        {
+                                                            day: 'numeric',
+                                                            month: 'short',
+                                                            year: 'numeric',
+                                                        },
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Select
-                                                        value={registration.status}
-                                                        onValueChange={(value) =>
+                                                        value={
+                                                            registration.status
+                                                        }
+                                                        onValueChange={(
+                                                            value,
+                                                        ) =>
                                                             handleStatusChange(
                                                                 registration.id,
                                                                 registration.user_id,
-                                                                value
+                                                                value,
                                                             )
                                                         }
                                                     >
@@ -292,11 +364,11 @@ export default function EventRegistrations({ event, registrations }: Props) {
                                                             <SelectValue>
                                                                 <Badge
                                                                     variant={getStatusBadgeVariant(
-                                                                        registration.status
+                                                                        registration.status,
                                                                     )}
                                                                 >
                                                                     {getStatusLabel(
-                                                                        registration.status
+                                                                        registration.status,
                                                                     )}
                                                                 </Badge>
                                                             </SelectValue>

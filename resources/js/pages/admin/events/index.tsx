@@ -1,4 +1,15 @@
 import { Icon } from '@/components/icon';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -32,17 +43,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
@@ -101,7 +101,9 @@ export default function EventManagement({ events, filters }: Props) {
     const [searchValue, setSearchValue] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || 'all');
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
+    const [editImagePreview, setEditImagePreview] = useState<string | null>(
+        null,
+    );
 
     const createForm = useForm({
         title: '',
@@ -134,7 +136,7 @@ export default function EventManagement({ events, filters }: Props) {
                 search: value,
                 status: statusFilter !== 'all' ? statusFilter : undefined,
             },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     };
 
@@ -147,7 +149,7 @@ export default function EventManagement({ events, filters }: Props) {
                 search: searchValue,
                 status: value !== 'all' ? value : undefined,
             },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     };
 
@@ -211,7 +213,9 @@ export default function EventManagement({ events, filters }: Props) {
     };
 
     // Handle image change for create form
-    const handleCreateImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCreateImageChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
         const file = e.target.files?.[0];
         if (file) {
             createForm.setData('image', file);
@@ -272,19 +276,29 @@ export default function EventManagement({ events, filters }: Props) {
                                 onChange={(e) => handleSearch(e.target.value)}
                             />
                         </div>
-                        <Select value={statusFilter} onValueChange={handleFilterChange}>
+                        <Select
+                            value={statusFilter}
+                            onValueChange={handleFilterChange}
+                        >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Semua Status" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Semua Status</SelectItem>
-                                <SelectItem value="published">Published</SelectItem>
+                                <SelectItem value="all">
+                                    Semua Status
+                                </SelectItem>
+                                <SelectItem value="published">
+                                    Published
+                                </SelectItem>
                                 <SelectItem value="draft">Draft</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                     <Button onClick={() => setIsCreateDialogOpen(true)}>
-                        <Icon iconNode={CirclePlusIcon} className="mr-2 h-4 w-4" />
+                        <Icon
+                            iconNode={CirclePlusIcon}
+                            className="mr-2 h-4 w-4"
+                        />
                         Buat Event
                     </Button>
                 </div>
@@ -295,7 +309,9 @@ export default function EventManagement({ events, filters }: Props) {
                         <CardContent className="flex items-center justify-center py-12">
                             <div className="text-center">
                                 <CalendarIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                                <h3 className="mt-4 text-lg font-semibold">Belum ada event</h3>
+                                <h3 className="mt-4 text-lg font-semibold">
+                                    Belum ada event
+                                </h3>
                                 <p className="mt-2 text-sm text-muted-foreground">
                                     Mulai dengan membuat event pertama Anda
                                 </p>
@@ -322,7 +338,10 @@ export default function EventManagement({ events, filters }: Props) {
                                         </CardTitle>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                >
                                                     <Icon
                                                         iconNode={EllipsisIcon}
                                                         className="h-4 w-4"
@@ -342,7 +361,9 @@ export default function EventManagement({ events, filters }: Props) {
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
-                                                    onClick={() => openEditDialog(event)}
+                                                    onClick={() =>
+                                                        openEditDialog(event)
+                                                    }
                                                 >
                                                     <Icon
                                                         iconNode={PencilIcon}
@@ -352,7 +373,9 @@ export default function EventManagement({ events, filters }: Props) {
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
-                                                    onClick={() => setDeletingEvent(event)}
+                                                    onClick={() =>
+                                                        setDeletingEvent(event)
+                                                    }
                                                     className="text-red-600 dark:text-red-400"
                                                 >
                                                     <Icon
@@ -367,10 +390,14 @@ export default function EventManagement({ events, filters }: Props) {
                                     <div className="flex items-center gap-2">
                                         <Badge
                                             variant={
-                                                event.is_published ? 'default' : 'secondary'
+                                                event.is_published
+                                                    ? 'default'
+                                                    : 'secondary'
                                             }
                                         >
-                                            {event.is_published ? 'Published' : 'Draft'}
+                                            {event.is_published
+                                                ? 'Published'
+                                                : 'Draft'}
                                         </Badge>
                                         {event.max_participants && (
                                             <Badge variant="outline">
@@ -394,14 +421,18 @@ export default function EventManagement({ events, filters }: Props) {
                                                 iconNode={CalendarIcon}
                                                 className="h-4 w-4"
                                             />
-                                            <span>{formatDate(event.event_date)}</span>
+                                            <span>
+                                                {formatDate(event.event_date)}
+                                            </span>
                                         </div>
                                         <div className="flex items-center gap-2 text-muted-foreground">
                                             <Icon
                                                 iconNode={MapPinIcon}
                                                 className="h-4 w-4"
                                             />
-                                            <span className="line-clamp-1">{event.location}</span>
+                                            <span className="line-clamp-1">
+                                                {event.location}
+                                            </span>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -414,7 +445,8 @@ export default function EventManagement({ events, filters }: Props) {
                 {events.last_page > 1 && (
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-muted-foreground">
-                            Menampilkan {events.data.length} dari {events.total} event
+                            Menampilkan {events.data.length} dari {events.total}{' '}
+                            event
                         </p>
                         <div className="flex gap-2">
                             <Button
@@ -432,7 +464,7 @@ export default function EventManagement({ events, filters }: Props) {
                                                     ? statusFilter
                                                     : undefined,
                                         },
-                                        { preserveState: true }
+                                        { preserveState: true },
                                     )
                                 }
                             >
@@ -441,7 +473,9 @@ export default function EventManagement({ events, filters }: Props) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                disabled={events.current_page === events.last_page}
+                                disabled={
+                                    events.current_page === events.last_page
+                                }
                                 onClick={() =>
                                     router.get(
                                         '/admin/events',
@@ -453,7 +487,7 @@ export default function EventManagement({ events, filters }: Props) {
                                                     ? statusFilter
                                                     : undefined,
                                         },
-                                        { preserveState: true }
+                                        { preserveState: true },
                                     )
                                 }
                             >
@@ -465,7 +499,10 @@ export default function EventManagement({ events, filters }: Props) {
             </div>
 
             {/* Create Event Dialog */}
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <Dialog
+                open={isCreateDialogOpen}
+                onOpenChange={setIsCreateDialogOpen}
+            >
                 <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Buat Event Baru</DialogTitle>
@@ -476,12 +513,15 @@ export default function EventManagement({ events, filters }: Props) {
                     <form onSubmit={handleCreate} className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="create-title">
-                                Judul Event <span className="text-red-500">*</span>
+                                Judul Event{' '}
+                                <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="create-title"
                                 value={createForm.data.title}
-                                onChange={(e) => createForm.setData('title', e.target.value)}
+                                onChange={(e) =>
+                                    createForm.setData('title', e.target.value)
+                                }
                                 required
                             />
                             {createForm.errors.title && (
@@ -493,13 +533,17 @@ export default function EventManagement({ events, filters }: Props) {
 
                         <div className="space-y-2">
                             <Label htmlFor="create-description">
-                                Deskripsi <span className="text-red-500">*</span>
+                                Deskripsi{' '}
+                                <span className="text-red-500">*</span>
                             </Label>
                             <Textarea
                                 id="create-description"
                                 value={createForm.data.description}
                                 onChange={(e) =>
-                                    createForm.setData('description', e.target.value)
+                                    createForm.setData(
+                                        'description',
+                                        e.target.value,
+                                    )
                                 }
                                 rows={4}
                                 required
@@ -518,7 +562,12 @@ export default function EventManagement({ events, filters }: Props) {
                             <Input
                                 id="create-location"
                                 value={createForm.data.location}
-                                onChange={(e) => createForm.setData('location', e.target.value)}
+                                onChange={(e) =>
+                                    createForm.setData(
+                                        'location',
+                                        e.target.value,
+                                    )
+                                }
                                 required
                             />
                             {createForm.errors.location && (
@@ -531,14 +580,18 @@ export default function EventManagement({ events, filters }: Props) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="create-event-date">
-                                    Tanggal Event <span className="text-red-500">*</span>
+                                    Tanggal Event{' '}
+                                    <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="create-event-date"
                                     type="datetime-local"
                                     value={createForm.data.event_date}
                                     onChange={(e) =>
-                                        createForm.setData('event_date', e.target.value)
+                                        createForm.setData(
+                                            'event_date',
+                                            e.target.value,
+                                        )
                                     }
                                     required
                                 />
@@ -551,20 +604,29 @@ export default function EventManagement({ events, filters }: Props) {
 
                             <div className="space-y-2">
                                 <Label htmlFor="create-deadline">
-                                    Batas Pendaftaran <span className="text-red-500">*</span>
+                                    Batas Pendaftaran{' '}
+                                    <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="create-deadline"
                                     type="datetime-local"
-                                    value={createForm.data.registration_deadline}
+                                    value={
+                                        createForm.data.registration_deadline
+                                    }
                                     onChange={(e) =>
-                                        createForm.setData('registration_deadline', e.target.value)
+                                        createForm.setData(
+                                            'registration_deadline',
+                                            e.target.value,
+                                        )
                                     }
                                     required
                                 />
                                 {createForm.errors.registration_deadline && (
                                     <p className="text-sm text-red-600 dark:text-red-400">
-                                        {createForm.errors.registration_deadline}
+                                        {
+                                            createForm.errors
+                                                .registration_deadline
+                                        }
                                     </p>
                                 )}
                             </div>
@@ -580,7 +642,10 @@ export default function EventManagement({ events, filters }: Props) {
                                 min="1"
                                 value={createForm.data.max_participants}
                                 onChange={(e) =>
-                                    createForm.setData('max_participants', e.target.value)
+                                    createForm.setData(
+                                        'max_participants',
+                                        e.target.value,
+                                    )
                                 }
                             />
                             <p className="text-xs text-muted-foreground">
@@ -594,7 +659,9 @@ export default function EventManagement({ events, filters }: Props) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="create-image">Gambar Event (opsional)</Label>
+                            <Label htmlFor="create-image">
+                                Gambar Event (opsional)
+                            </Label>
                             <Input
                                 id="create-image"
                                 type="file"
@@ -623,11 +690,17 @@ export default function EventManagement({ events, filters }: Props) {
                                 id="create-is-published"
                                 checked={createForm.data.is_published}
                                 onChange={(e) =>
-                                    createForm.setData('is_published', e.target.checked)
+                                    createForm.setData(
+                                        'is_published',
+                                        e.target.checked,
+                                    )
                                 }
                                 className="h-4 w-4 rounded border-gray-300"
                             />
-                            <Label htmlFor="create-is-published" className="cursor-pointer">
+                            <Label
+                                htmlFor="create-is-published"
+                                className="cursor-pointer"
+                            >
                                 Publish event sekarang
                             </Label>
                         </div>
@@ -644,8 +717,13 @@ export default function EventManagement({ events, filters }: Props) {
                             >
                                 Batal
                             </Button>
-                            <Button type="submit" disabled={createForm.processing}>
-                                {createForm.processing ? 'Menyimpan...' : 'Buat Event'}
+                            <Button
+                                type="submit"
+                                disabled={createForm.processing}
+                            >
+                                {createForm.processing
+                                    ? 'Menyimpan...'
+                                    : 'Buat Event'}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -653,21 +731,29 @@ export default function EventManagement({ events, filters }: Props) {
             </Dialog>
 
             {/* Edit Event Dialog */}
-            <Dialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>
+            <Dialog
+                open={!!editingEvent}
+                onOpenChange={() => setEditingEvent(null)}
+            >
                 <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Event</DialogTitle>
-                        <DialogDescription>Perbarui informasi event</DialogDescription>
+                        <DialogDescription>
+                            Perbarui informasi event
+                        </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleEdit} className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="edit-title">
-                                Judul Event <span className="text-red-500">*</span>
+                                Judul Event{' '}
+                                <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="edit-title"
                                 value={editForm.data.title}
-                                onChange={(e) => editForm.setData('title', e.target.value)}
+                                onChange={(e) =>
+                                    editForm.setData('title', e.target.value)
+                                }
                                 required
                             />
                             {editForm.errors.title && (
@@ -679,12 +765,18 @@ export default function EventManagement({ events, filters }: Props) {
 
                         <div className="space-y-2">
                             <Label htmlFor="edit-description">
-                                Deskripsi <span className="text-red-500">*</span>
+                                Deskripsi{' '}
+                                <span className="text-red-500">*</span>
                             </Label>
                             <Textarea
                                 id="edit-description"
                                 value={editForm.data.description}
-                                onChange={(e) => editForm.setData('description', e.target.value)}
+                                onChange={(e) =>
+                                    editForm.setData(
+                                        'description',
+                                        e.target.value,
+                                    )
+                                }
                                 rows={4}
                                 required
                             />
@@ -702,7 +794,9 @@ export default function EventManagement({ events, filters }: Props) {
                             <Input
                                 id="edit-location"
                                 value={editForm.data.location}
-                                onChange={(e) => editForm.setData('location', e.target.value)}
+                                onChange={(e) =>
+                                    editForm.setData('location', e.target.value)
+                                }
                                 required
                             />
                             {editForm.errors.location && (
@@ -715,14 +809,18 @@ export default function EventManagement({ events, filters }: Props) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="edit-event-date">
-                                    Tanggal Event <span className="text-red-500">*</span>
+                                    Tanggal Event{' '}
+                                    <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="edit-event-date"
                                     type="datetime-local"
                                     value={editForm.data.event_date}
                                     onChange={(e) =>
-                                        editForm.setData('event_date', e.target.value)
+                                        editForm.setData(
+                                            'event_date',
+                                            e.target.value,
+                                        )
                                     }
                                     required
                                 />
@@ -735,14 +833,18 @@ export default function EventManagement({ events, filters }: Props) {
 
                             <div className="space-y-2">
                                 <Label htmlFor="edit-deadline">
-                                    Batas Pendaftaran <span className="text-red-500">*</span>
+                                    Batas Pendaftaran{' '}
+                                    <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="edit-deadline"
                                     type="datetime-local"
                                     value={editForm.data.registration_deadline}
                                     onChange={(e) =>
-                                        editForm.setData('registration_deadline', e.target.value)
+                                        editForm.setData(
+                                            'registration_deadline',
+                                            e.target.value,
+                                        )
                                     }
                                     required
                                 />
@@ -764,7 +866,10 @@ export default function EventManagement({ events, filters }: Props) {
                                 min="1"
                                 value={editForm.data.max_participants}
                                 onChange={(e) =>
-                                    editForm.setData('max_participants', e.target.value)
+                                    editForm.setData(
+                                        'max_participants',
+                                        e.target.value,
+                                    )
                                 }
                             />
                             <p className="text-xs text-muted-foreground">
@@ -778,7 +883,9 @@ export default function EventManagement({ events, filters }: Props) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="edit-image">Gambar Event Baru (opsional)</Label>
+                            <Label htmlFor="edit-image">
+                                Gambar Event Baru (opsional)
+                            </Label>
                             <Input
                                 id="edit-image"
                                 type="file"
@@ -807,11 +914,17 @@ export default function EventManagement({ events, filters }: Props) {
                                 id="edit-is-published"
                                 checked={editForm.data.is_published}
                                 onChange={(e) =>
-                                    editForm.setData('is_published', e.target.checked)
+                                    editForm.setData(
+                                        'is_published',
+                                        e.target.checked,
+                                    )
                                 }
                                 className="h-4 w-4 rounded border-gray-300"
                             />
-                            <Label htmlFor="edit-is-published" className="cursor-pointer">
+                            <Label
+                                htmlFor="edit-is-published"
+                                className="cursor-pointer"
+                            >
                                 Event dipublish
                             </Label>
                         </div>
@@ -828,8 +941,13 @@ export default function EventManagement({ events, filters }: Props) {
                             >
                                 Batal
                             </Button>
-                            <Button type="submit" disabled={editForm.processing}>
-                                {editForm.processing ? 'Menyimpan...' : 'Simpan Perubahan'}
+                            <Button
+                                type="submit"
+                                disabled={editForm.processing}
+                            >
+                                {editForm.processing
+                                    ? 'Menyimpan...'
+                                    : 'Simpan Perubahan'}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -837,14 +955,18 @@ export default function EventManagement({ events, filters }: Props) {
             </Dialog>
 
             {/* Delete Confirmation Dialog */}
-            <AlertDialog open={!!deletingEvent} onOpenChange={() => setDeletingEvent(null)}>
+            <AlertDialog
+                open={!!deletingEvent}
+                onOpenChange={() => setDeletingEvent(null)}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Hapus Event</AlertDialogTitle>
                         <AlertDialogDescription>
                             Apakah Anda yakin ingin menghapus event{' '}
-                            <strong>{deletingEvent?.title}</strong>? Semua data pendaftaran juga
-                            akan terhapus. Tindakan ini tidak dapat dibatalkan.
+                            <strong>{deletingEvent?.title}</strong>? Semua data
+                            pendaftaran juga akan terhapus. Tindakan ini tidak
+                            dapat dibatalkan.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
