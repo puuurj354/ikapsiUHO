@@ -26,7 +26,7 @@ import {
     SearchIcon,
     UsersIcon,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface Event {
     id: number;
@@ -77,7 +77,7 @@ export default function EventsIndex({ events, filters }: Props) {
                 search: value,
                 time: timeFilter !== 'all' ? timeFilter : undefined,
             },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     };
 
@@ -90,7 +90,7 @@ export default function EventsIndex({ events, filters }: Props) {
                 search: searchValue,
                 time: value !== 'all' ? value : undefined,
             },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
     };
 
@@ -135,7 +135,7 @@ export default function EventsIndex({ events, filters }: Props) {
                 <div className="flex flex-col gap-4 sm:flex-row">
                     <div className="flex-1">
                         <div className="relative">
-                            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
                                 placeholder="Cari event..."
                                 value={searchValue}
@@ -144,13 +144,18 @@ export default function EventsIndex({ events, filters }: Props) {
                             />
                         </div>
                     </div>
-                    <Select value={timeFilter} onValueChange={handleFilterChange}>
+                    <Select
+                        value={timeFilter}
+                        onValueChange={handleFilterChange}
+                    >
                         <SelectTrigger className="w-full sm:w-[200px]">
                             <SelectValue placeholder="Semua Event" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Semua Event</SelectItem>
-                            <SelectItem value="upcoming">Event Mendatang</SelectItem>
+                            <SelectItem value="upcoming">
+                                Event Mendatang
+                            </SelectItem>
                             <SelectItem value="past">Event Selesai</SelectItem>
                         </SelectContent>
                     </Select>
@@ -166,7 +171,8 @@ export default function EventsIndex({ events, filters }: Props) {
                                     Belum ada event
                                 </h3>
                                 <p className="mt-2 text-muted-foreground">
-                                    Event akan segera hadir. Pantau terus halaman ini!
+                                    Event akan segera hadir. Pantau terus
+                                    halaman ini!
                                 </p>
                             </div>
                         </CardContent>
@@ -207,17 +213,25 @@ export default function EventsIndex({ events, filters }: Props) {
                                         {/* Status Badges */}
                                         <div className="flex flex-wrap gap-2">
                                             {event.is_registered && (
-                                                <Badge variant="default" className="text-xs">
+                                                <Badge
+                                                    variant="default"
+                                                    className="text-xs"
+                                                >
                                                     ✓ Terdaftar
                                                 </Badge>
                                             )}
                                             {event.is_full && (
-                                                <Badge variant="destructive" className="text-xs">
+                                                <Badge
+                                                    variant="destructive"
+                                                    className="text-xs"
+                                                >
                                                     Penuh
                                                 </Badge>
                                             )}
                                             {!event.is_registration_open &&
-                                                isUpcoming(event.event_date) && (
+                                                isUpcoming(
+                                                    event.event_date,
+                                                ) && (
                                                     <Badge
                                                         variant="secondary"
                                                         className="text-xs"
@@ -240,14 +254,22 @@ export default function EventsIndex({ events, filters }: Props) {
                                                     iconNode={CalendarIcon}
                                                     className="h-4 w-4 shrink-0"
                                                 />
-                                                <span>{formatDate(event.event_date)}</span>
+                                                <span>
+                                                    {formatDate(
+                                                        event.event_date,
+                                                    )}
+                                                </span>
                                             </div>
                                             <div className="flex items-center gap-2 text-muted-foreground">
                                                 <Icon
                                                     iconNode={ClockIcon}
                                                     className="h-4 w-4 shrink-0"
                                                 />
-                                                <span>{formatTime(event.event_date)}</span>
+                                                <span>
+                                                    {formatTime(
+                                                        event.event_date,
+                                                    )}
+                                                </span>
                                             </div>
                                             <div className="flex items-center gap-2 text-muted-foreground">
                                                 <Icon
@@ -265,8 +287,12 @@ export default function EventsIndex({ events, filters }: Props) {
                                                         className="h-4 w-4 shrink-0"
                                                     />
                                                     <span>
-                                                        {event.registrations_count} /{' '}
-                                                        {event.max_participants} peserta
+                                                        {
+                                                            event.registrations_count
+                                                        }{' '}
+                                                        /{' '}
+                                                        {event.max_participants}{' '}
+                                                        peserta
                                                     </span>
                                                 </div>
                                             )}
@@ -276,11 +302,14 @@ export default function EventsIndex({ events, filters }: Props) {
                                         <Button
                                             className="w-full"
                                             variant={
-                                                event.is_registered ? 'outline' : 'default'
+                                                event.is_registered
+                                                    ? 'outline'
+                                                    : 'default'
                                             }
                                             disabled={
                                                 !isUpcoming(event.event_date) ||
-                                                (event.is_full && !event.is_registered) ||
+                                                (event.is_full &&
+                                                    !event.is_registered) ||
                                                 (!event.is_registration_open &&
                                                     !event.is_registered)
                                             }
@@ -306,7 +335,8 @@ export default function EventsIndex({ events, filters }: Props) {
                 {events.last_page > 1 && (
                     <div className="flex items-center justify-between">
                         <p className="text-sm text-muted-foreground">
-                            Menampilkan {events.data.length} dari {events.total} event
+                            Menampilkan {events.data.length} dari {events.total}{' '}
+                            event
                         </p>
                         <div className="flex gap-2">
                             <Button
@@ -324,7 +354,7 @@ export default function EventsIndex({ events, filters }: Props) {
                                                     ? timeFilter
                                                     : undefined,
                                         },
-                                        { preserveState: true }
+                                        { preserveState: true },
                                     )
                                 }
                             >
@@ -333,7 +363,9 @@ export default function EventsIndex({ events, filters }: Props) {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                disabled={events.current_page === events.last_page}
+                                disabled={
+                                    events.current_page === events.last_page
+                                }
                                 onClick={() =>
                                     router.get(
                                         '/events',
@@ -345,7 +377,7 @@ export default function EventsIndex({ events, filters }: Props) {
                                                     ? timeFilter
                                                     : undefined,
                                         },
-                                        { preserveState: true }
+                                        { preserveState: true },
                                     )
                                 }
                             >

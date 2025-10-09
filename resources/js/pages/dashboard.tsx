@@ -366,58 +366,48 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                            <Link href="/alumni/directory">
-                                <Button
-                                    variant="outline"
-                                    className="h-auto w-full flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
-                                >
-                                    <Icon
-                                        iconNode={Users}
-                                        className="h-6 w-6 transition-transform hover:scale-110"
-                                    />
-                                    <span className="text-sm font-medium">
-                                        Direktori Alumni
-                                    </span>
-                                </Button>
-                            </Link>
-                            <Button
-                                variant="outline"
-                                className="h-auto flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
+                            <Link
+                                href="/alumni/directory"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
                             >
+                                <Icon
+                                    iconNode={Users}
+                                    className="h-5 w-5 text-primary"
+                                />
+                                <span className="font-medium">
+                                    Direktori Alumni
+                                </span>
+                            </Link>
+                            <div className="flex items-center space-x-3 rounded-lg border p-4">
                                 <Icon
                                     iconNode={MessageSquare}
-                                    className="h-6 w-6 transition-transform hover:scale-110"
+                                    className="h-5 w-5 text-primary"
                                 />
-                                <span className="text-sm font-medium">
+                                <span className="font-medium">
                                     Forum Diskusi
                                 </span>
-                            </Button>
-                            <Link href="/events">
-                                <Button
-                                    variant="outline"
-                                    className="h-auto w-full flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
-                                >
-                                    <Icon
-                                        iconNode={Calendar}
-                                        className="h-6 w-6 transition-transform hover:scale-110"
-                                    />
-                                    <span className="text-sm font-medium">
-                                        Event & Kegiatan
-                                    </span>
-                                </Button>
-                            </Link>
-                            <Button
-                                variant="outline"
-                                className="h-auto flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
+                            </div>
+                            <Link
+                                href="/events"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
                             >
                                 <Icon
-                                    iconNode={BookOpen}
-                                    className="h-6 w-6 transition-transform hover:scale-110"
+                                    iconNode={Calendar}
+                                    className="h-5 w-5 text-primary"
                                 />
-                                <span className="text-sm font-medium">
+                                <span className="font-medium">
+                                    Event & Kegiatan
+                                </span>
+                            </Link>
+                            <div className="flex items-center space-x-3 rounded-lg border p-4">
+                                <Icon
+                                    iconNode={BookOpen}
+                                    className="h-5 w-5 text-primary"
+                                />
+                                <span className="font-medium">
                                     Berita & Artikel
                                 </span>
-                            </Button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

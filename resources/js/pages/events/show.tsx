@@ -1,13 +1,4 @@
 import { Icon } from '@/components/icon';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -18,19 +9,28 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
     ArrowLeftIcon,
     CalendarIcon,
+    CheckCircleIcon,
     ClockIcon,
     MapPinIcon,
     UsersIcon,
-    CheckCircleIcon,
     XCircleIcon,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface Event {
     id: number;
@@ -95,7 +95,7 @@ export default function EventShow({ event }: Props) {
                     setIsProcessing(false);
                     setIsRegisterDialogOpen(false);
                 },
-            }
+            },
         );
     };
 
@@ -111,13 +111,16 @@ export default function EventShow({ event }: Props) {
                     setIsProcessing(false);
                     setIsCancelDialogOpen(false);
                 },
-            }
+            },
         );
     };
 
     // Determine button state
     const canRegister =
-        isUpcoming && !event.is_registered && !event.is_full && event.is_registration_open;
+        isUpcoming &&
+        !event.is_registered &&
+        !event.is_full &&
+        event.is_registration_open;
     const canCancel = isUpcoming && event.is_registered;
 
     return (
@@ -128,7 +131,10 @@ export default function EventShow({ event }: Props) {
                 {/* Back Button */}
                 <Button variant="ghost" asChild>
                     <a href="/events">
-                        <Icon iconNode={ArrowLeftIcon} className="mr-2 h-4 w-4" />
+                        <Icon
+                            iconNode={ArrowLeftIcon}
+                            className="mr-2 h-4 w-4"
+                        />
                         Kembali ke Daftar Event
                     </a>
                 </Button>
@@ -160,13 +166,19 @@ export default function EventShow({ event }: Props) {
                                     </Badge>
                                 )}
                                 {event.is_full && (
-                                    <Badge variant="destructive">Kuota Penuh</Badge>
+                                    <Badge variant="destructive">
+                                        Kuota Penuh
+                                    </Badge>
                                 )}
                                 {!event.is_registration_open && isUpcoming && (
-                                    <Badge variant="secondary">Pendaftaran Ditutup</Badge>
+                                    <Badge variant="secondary">
+                                        Pendaftaran Ditutup
+                                    </Badge>
                                 )}
                                 {!isUpcoming && (
-                                    <Badge variant="outline">Event Selesai</Badge>
+                                    <Badge variant="outline">
+                                        Event Selesai
+                                    </Badge>
                                 )}
                             </div>
 
@@ -176,27 +188,42 @@ export default function EventShow({ event }: Props) {
 
                             <div className="mt-6 space-y-2 text-muted-foreground">
                                 <div className="flex items-center gap-3">
-                                    <Icon iconNode={CalendarIcon} className="h-5 w-5" />
+                                    <Icon
+                                        iconNode={CalendarIcon}
+                                        className="h-5 w-5"
+                                    />
                                     <span className="text-base">
                                         {formatDate(event.event_date)}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Icon iconNode={ClockIcon} className="h-5 w-5" />
+                                    <Icon
+                                        iconNode={ClockIcon}
+                                        className="h-5 w-5"
+                                    />
                                     <span className="text-base">
                                         {formatTime(event.event_date)} WIT
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Icon iconNode={MapPinIcon} className="h-5 w-5" />
-                                    <span className="text-base">{event.location}</span>
+                                    <Icon
+                                        iconNode={MapPinIcon}
+                                        className="h-5 w-5"
+                                    />
+                                    <span className="text-base">
+                                        {event.location}
+                                    </span>
                                 </div>
                                 {event.max_participants && (
                                     <div className="flex items-center gap-3">
-                                        <Icon iconNode={UsersIcon} className="h-5 w-5" />
+                                        <Icon
+                                            iconNode={UsersIcon}
+                                            className="h-5 w-5"
+                                        />
                                         <span className="text-base">
                                             {event.registrations_count} /{' '}
-                                            {event.max_participants} peserta terdaftar
+                                            {event.max_participants} peserta
+                                            terdaftar
                                         </span>
                                     </div>
                                 )}
@@ -235,25 +262,32 @@ export default function EventShow({ event }: Props) {
                                         Batas Pendaftaran
                                     </p>
                                     <p className="mt-1 text-sm text-muted-foreground">
-                                        {formatDate(event.registration_deadline)}
+                                        {formatDate(
+                                            event.registration_deadline,
+                                        )}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        {formatTime(event.registration_deadline)} WIT
+                                        {formatTime(
+                                            event.registration_deadline,
+                                        )}{' '}
+                                        WIT
                                     </p>
                                 </div>
 
                                 {/* Capacity Info */}
                                 {event.max_participants && (
                                     <div className="rounded-lg border bg-muted/50 p-4">
-                                        <p className="text-sm font-medium">Kapasitas</p>
+                                        <p className="text-sm font-medium">
+                                            Kapasitas
+                                        </p>
                                         <div className="mt-2">
                                             <div className="flex items-center justify-between text-sm">
                                                 <span className="text-muted-foreground">
                                                     Terdaftar
                                                 </span>
                                                 <span className="font-semibold">
-                                                    {event.registrations_count} /{' '}
-                                                    {event.max_participants}
+                                                    {event.registrations_count}{' '}
+                                                    / {event.max_participants}
                                                 </span>
                                             </div>
                                             <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
@@ -273,7 +307,9 @@ export default function EventShow({ event }: Props) {
                                     {canRegister && (
                                         <Button
                                             className="w-full"
-                                            onClick={() => setIsRegisterDialogOpen(true)}
+                                            onClick={() =>
+                                                setIsRegisterDialogOpen(true)
+                                            }
                                         >
                                             Daftar Event Ini
                                         </Button>
@@ -283,7 +319,9 @@ export default function EventShow({ event }: Props) {
                                         <Button
                                             className="w-full"
                                             variant="destructive"
-                                            onClick={() => setIsCancelDialogOpen(true)}
+                                            onClick={() =>
+                                                setIsCancelDialogOpen(true)
+                                            }
                                         >
                                             <Icon
                                                 iconNode={XCircleIcon}
@@ -326,7 +364,9 @@ export default function EventShow({ event }: Props) {
                             </CardHeader>
                             <CardContent className="space-y-3 text-sm">
                                 <div>
-                                    <p className="font-medium">Syarat & Ketentuan:</p>
+                                    <p className="font-medium">
+                                        Syarat & Ketentuan:
+                                    </p>
                                     <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
                                         <li>Alumni Psikologi UHO</li>
                                         <li>Harap datang tepat waktu</li>
@@ -352,20 +392,26 @@ export default function EventShow({ event }: Props) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Konfirmasi Pendaftaran</AlertDialogTitle>
+                        <AlertDialogTitle>
+                            Konfirmasi Pendaftaran
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
                             Apakah Anda yakin ingin mendaftar untuk event{' '}
                             <strong>{event.title}</strong>?
                             <br />
                             <br />
-                            Anda akan menerima konfirmasi melalui email setelah mendaftar.
+                            Anda akan menerima konfirmasi melalui email setelah
+                            mendaftar.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel disabled={isProcessing}>
                             Batal
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={handleRegister} disabled={isProcessing}>
+                        <AlertDialogAction
+                            onClick={handleRegister}
+                            disabled={isProcessing}
+                        >
                             {isProcessing ? 'Memproses...' : 'Ya, Daftar'}
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -373,16 +419,22 @@ export default function EventShow({ event }: Props) {
             </AlertDialog>
 
             {/* Cancel Registration Dialog */}
-            <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+            <AlertDialog
+                open={isCancelDialogOpen}
+                onOpenChange={setIsCancelDialogOpen}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Batalkan Pendaftaran</AlertDialogTitle>
+                        <AlertDialogTitle>
+                            Batalkan Pendaftaran
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Apakah Anda yakin ingin membatalkan pendaftaran untuk event{' '}
-                            <strong>{event.title}</strong>?
+                            Apakah Anda yakin ingin membatalkan pendaftaran
+                            untuk event <strong>{event.title}</strong>?
                             <br />
                             <br />
-                            Anda dapat mendaftar kembali jika kuota masih tersedia.
+                            Anda dapat mendaftar kembali jika kuota masih
+                            tersedia.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
