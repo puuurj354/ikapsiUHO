@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Event extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'description',
@@ -49,15 +52,10 @@ class Event extends Model
      */
     public function isUserRegistered(int $userId): bool
     {
-        return $this->registrations()->where('user_id', $userId)->exists();
-    }
-
-    /**
-     * Get registration count
-     */
-    public function getRegistrationCountAttribute(): int
-    {
-        return $this->registrations()->count();
+        return $this->registrations()
+            ->where('user_id', $userId)
+            ->wherePivot('status', '!=', 'cancelled')
+            ->exists();
     }
 
     /**
@@ -69,7 +67,11 @@ class Event extends Model
             return false;
         }
 
-        return $this->registration_count >= $this->max_participants;
+        $activeRegistrations = $this->registrations()
+            ->wherePivot('status', '!=', 'cancelled')
+            ->count();
+
+        return $activeRegistrations >= $this->max_participants;
     }
 
     /**
