@@ -1,22 +1,28 @@
-import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@/components/icon';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    Users,
-    GraduationCap,
-    User,
-    Calendar,
-    CheckCircle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link } from '@inertiajs/react';
+import {
     AlertCircle,
     BookOpen,
+    Calendar,
+    CheckCircle,
+    GraduationCap,
     MessageSquare,
-    Settings
+    Settings,
+    User,
+    Users,
 } from 'lucide-react';
-import { dashboard } from '@/routes';
 
 interface UserProfile {
     name: string;
@@ -66,7 +72,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard({ dashboardData }: DashboardProps) {
-    const { user_profile, statistics, recent_alumni, alumni_by_year } = dashboardData;
+    const { user_profile, statistics, recent_alumni, alumni_by_year } =
+        dashboardData;
 
     const statCards = [
         {
@@ -99,32 +106,36 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard Alumni" />
 
-            <div className="container mx-auto py-8 space-y-8">
+            <div className="container mx-auto space-y-8 py-8">
                 {/* Welcome Header */}
                 <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">
                             Selamat Datang, {user_profile.name}!
                         </h1>
-                        <p className="text-muted-foreground mt-2">
-                            Dashboard IKAPSI UHO - Ikatan Alumni Psikologi Universitas Halu Oleo
+                        <p className="mt-2 text-muted-foreground">
+                            Dashboard IKAPSI UHO - Ikatan Alumni Psikologi
+                            Universitas Halu Oleo
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
                         {user_profile.email_verified ? (
-                            <Badge variant="secondary" className="text-green-600">
-                                <CheckCircle className="w-3 h-3 mr-1" />
+                            <Badge
+                                variant="secondary"
+                                className="text-green-600"
+                            >
+                                <CheckCircle className="mr-1 h-3 w-3" />
                                 Email Terverifikasi
                             </Badge>
                         ) : (
                             <Badge variant="destructive">
-                                <AlertCircle className="w-3 h-3 mr-1" />
+                                <AlertCircle className="mr-1 h-3 w-3" />
                                 Email Belum Terverifikasi
                             </Badge>
                         )}
                         {user_profile.two_factor_enabled && (
                             <Badge variant="outline">
-                                <CheckCircle className="w-3 h-3 mr-1" />
+                                <CheckCircle className="mr-1 h-3 w-3" />
                                 2FA Aktif
                             </Badge>
                         )}
@@ -135,7 +146,7 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center">
-                            <User className="w-5 h-5 mr-2" />
+                            <User className="mr-2 h-5 w-5" />
                             Profil Alumni
                         </CardTitle>
                         <CardDescription>
@@ -143,37 +154,53 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">Nama Lengkap</p>
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Nama Lengkap
+                                </p>
                                 <p className="text-sm">{user_profile.name}</p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">Email</p>
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Email
+                                </p>
                                 <p className="text-sm">{user_profile.email}</p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">Angkatan</p>
-                                <p className="text-sm">{user_profile.angkatan || 'Belum diisi'}</p>
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Angkatan
+                                </p>
+                                <p className="text-sm">
+                                    {user_profile.angkatan || 'Belum diisi'}
+                                </p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">Profesi</p>
-                                <p className="text-sm">{user_profile.profesi || 'Belum diisi'}</p>
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Profesi
+                                </p>
+                                <p className="text-sm">
+                                    {user_profile.profesi || 'Belum diisi'}
+                                </p>
                             </div>
                         </div>
                         {user_profile.bio && (
                             <div className="mt-4 space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">Bio</p>
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Bio
+                                </p>
                                 <p className="text-sm">{user_profile.bio}</p>
                             </div>
                         )}
                         <div className="mt-4 flex space-x-2">
+                            <Link href="/settings/profile">
+                                <Button variant="outline" size="sm">
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    Update Profil
+                                </Button>
+                            </Link>
                             <Button variant="outline" size="sm">
-                                <Settings className="w-4 h-4 mr-2" />
-                                Update Profil
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                <BookOpen className="w-4 h-4 mr-2" />
+                                <BookOpen className="mr-2 h-4 w-4" />
                                 Lengkapi Data
                             </Button>
                         </div>
@@ -181,7 +208,7 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                 </Card>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                     {statCards.map((stat, index) => (
                         <Card key={index}>
                             <CardHeader className="pb-3">
@@ -189,14 +216,21 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                                     <CardTitle className="text-sm font-medium text-muted-foreground">
                                         {stat.title}
                                     </CardTitle>
-                                    <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                                        <Icon iconNode={stat.icon} className={`h-5 w-5 ${stat.color}`} />
+                                    <div
+                                        className={`rounded-lg p-2 ${stat.bgColor}`}
+                                    >
+                                        <Icon
+                                            iconNode={stat.icon}
+                                            className={`h-5 w-5 ${stat.color}`}
+                                        />
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">{stat.value}</div>
-                                <p className="text-xs text-muted-foreground mt-1">
+                                <div className="text-3xl font-bold">
+                                    {stat.value}
+                                </div>
+                                <p className="mt-1 text-xs text-muted-foreground">
                                     {stat.description}
                                 </p>
                             </CardContent>
@@ -205,12 +239,12 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                 </div>
 
                 {/* Recent Alumni & Alumni by Year */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     {/* Recent Alumni */}
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center">
-                                <Users className="w-5 h-5 mr-2" />
+                                <Users className="mr-2 h-5 w-5" />
                                 Alumni Terbaru
                             </CardTitle>
                             <CardDescription>
@@ -221,22 +255,35 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                             <div className="space-y-4">
                                 {recent_alumni.length > 0 ? (
                                     recent_alumni.map((alumni) => (
-                                        <div key={alumni.id} className="flex items-center space-x-4">
-                                            <div className="bg-primary/10 text-primary rounded-lg p-3">
-                                                <Icon iconNode={User} className="h-5 w-5" />
+                                        <div
+                                            key={alumni.id}
+                                            className="flex items-center space-x-4"
+                                        >
+                                            <div className="rounded-lg bg-primary/10 p-3 text-primary">
+                                                <Icon
+                                                    iconNode={User}
+                                                    className="h-5 w-5"
+                                                />
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-semibold truncate">{alumni.name}</p>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="truncate font-semibold">
+                                                    {alumni.name}
+                                                </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {alumni.angkatan && `Angkatan ${alumni.angkatan}`}
-                                                    {alumni.profesi && ` • ${alumni.profesi}`}
+                                                    {alumni.angkatan &&
+                                                        `Angkatan ${alumni.angkatan}`}
+                                                    {alumni.profesi &&
+                                                        ` • ${alumni.profesi}`}
                                                 </p>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <Icon iconNode={Users} className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                                    <div className="py-8 text-center text-muted-foreground">
+                                        <Icon
+                                            iconNode={Users}
+                                            className="mx-auto mb-3 h-12 w-12 opacity-50"
+                                        />
                                         <p>Belum ada alumni terbaru</p>
                                     </div>
                                 )}
@@ -248,7 +295,7 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center">
-                                <GraduationCap className="w-5 h-5 mr-2" />
+                                <GraduationCap className="mr-2 h-5 w-5" />
                                 Alumni per Angkatan
                             </CardTitle>
                             <CardDescription>
@@ -259,27 +306,43 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                             <div className="space-y-4">
                                 {alumni_by_year.length > 0 ? (
                                     alumni_by_year.map((item) => (
-                                        <div key={item.angkatan} className="flex items-center justify-between">
+                                        <div
+                                            key={item.angkatan}
+                                            className="flex items-center justify-between"
+                                        >
                                             <div className="flex items-center space-x-4">
-                                                <div className="bg-primary/10 text-primary rounded-lg p-3">
-                                                    <Icon iconNode={GraduationCap} className="h-5 w-5" />
+                                                <div className="rounded-lg bg-primary/10 p-3 text-primary">
+                                                    <Icon
+                                                        iconNode={GraduationCap}
+                                                        className="h-5 w-5"
+                                                    />
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold">Angkatan {item.angkatan}</p>
+                                                    <p className="font-semibold">
+                                                        Angkatan {item.angkatan}
+                                                    </p>
                                                     <p className="text-sm text-muted-foreground">
                                                         {item.total} alumni
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="text-2xl font-bold">{item.total}</div>
+                                                <div className="text-2xl font-bold">
+                                                    {item.total}
+                                                </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <Icon iconNode={GraduationCap} className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                                        <p>Belum ada data alumni berdasarkan angkatan</p>
+                                    <div className="py-8 text-center text-muted-foreground">
+                                        <Icon
+                                            iconNode={GraduationCap}
+                                            className="mx-auto mb-3 h-12 w-12 opacity-50"
+                                        />
+                                        <p>
+                                            Belum ada data alumni berdasarkan
+                                            angkatan
+                                        </p>
                                     </div>
                                 )}
                             </div>
@@ -294,22 +357,50 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                         <CardDescription>Menu navigasi alumni</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <Button variant="outline" className="h-auto p-4 flex-col space-y-2">
-                                <Icon iconNode={Users} className="h-6 w-6" />
-                                <span className="text-sm font-medium">Direktori Alumni</span>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                            <Link href="/alumni/directory">
+                                <Button
+                                    variant="outline"
+                                    className="h-auto w-full flex-col space-y-2 p-4"
+                                >
+                                    <Icon
+                                        iconNode={Users}
+                                        className="h-6 w-6"
+                                    />
+                                    <span className="text-sm font-medium">
+                                        Direktori Alumni
+                                    </span>
+                                </Button>
+                            </Link>
+                            <Button
+                                variant="outline"
+                                className="h-auto flex-col space-y-2 p-4"
+                            >
+                                <Icon
+                                    iconNode={MessageSquare}
+                                    className="h-6 w-6"
+                                />
+                                <span className="text-sm font-medium">
+                                    Forum Diskusi
+                                </span>
                             </Button>
-                            <Button variant="outline" className="h-auto p-4 flex-col space-y-2">
-                                <Icon iconNode={MessageSquare} className="h-6 w-6" />
-                                <span className="text-sm font-medium">Forum Diskusi</span>
-                            </Button>
-                            <Button variant="outline" className="h-auto p-4 flex-col space-y-2">
+                            <Button
+                                variant="outline"
+                                className="h-auto flex-col space-y-2 p-4"
+                            >
                                 <Icon iconNode={Calendar} className="h-6 w-6" />
-                                <span className="text-sm font-medium">Event & Kegiatan</span>
+                                <span className="text-sm font-medium">
+                                    Event & Kegiatan
+                                </span>
                             </Button>
-                            <Button variant="outline" className="h-auto p-4 flex-col space-y-2">
+                            <Button
+                                variant="outline"
+                                className="h-auto flex-col space-y-2 p-4"
+                            >
                                 <Icon iconNode={BookOpen} className="h-6 w-6" />
-                                <span className="text-sm font-medium">Berita & Artikel</span>
+                                <span className="text-sm font-medium">
+                                    Berita & Artikel
+                                </span>
                             </Button>
                         </div>
                     </CardContent>
