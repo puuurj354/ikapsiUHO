@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_picture',
         'role',
         'angkatan',
         'profesi',
@@ -82,5 +83,36 @@ class User extends Authenticatable
     public function scopeAlumni($query)
     {
         return $query->where('role', Role::ALUMNI->value);
+    }
+
+    /**
+     * Get events created by this user
+     */
+    public function createdEvents()
+    {
+        return $this->hasMany(Event::class, 'created_by');
+    }
+
+    /**
+     * Get events registered by this user
+     */
+    public function registeredEvents()
+    {
+        return $this->belongsToMany(Event::class, 'event_registrations')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get profile picture URL
+     */
+    public function getProfilePictureUrlAttribute(): string
+    {
+        if ($this->profile_picture) {
+            return asset('storage/' . $this->profile_picture);
+        }
+        
+        // Return default avatar based on name initial
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
     }
 }
