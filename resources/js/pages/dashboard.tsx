@@ -369,11 +369,11 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                             <Link href="/alumni/directory">
                                 <Button
                                     variant="outline"
-                                    className="h-auto w-full flex-col space-y-2 p-4"
+                                    className="h-auto w-full flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
                                 >
                                     <Icon
                                         iconNode={Users}
-                                        className="h-6 w-6"
+                                        className="h-6 w-6 transition-transform hover:scale-110"
                                     />
                                     <span className="text-sm font-medium">
                                         Direktori Alumni
@@ -382,30 +382,38 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                             </Link>
                             <Button
                                 variant="outline"
-                                className="h-auto flex-col space-y-2 p-4"
+                                className="h-auto flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
                             >
                                 <Icon
                                     iconNode={MessageSquare}
-                                    className="h-6 w-6"
+                                    className="h-6 w-6 transition-transform hover:scale-110"
                                 />
                                 <span className="text-sm font-medium">
                                     Forum Diskusi
                                 </span>
                             </Button>
+                            <Link href="/events">
+                                <Button
+                                    variant="outline"
+                                    className="h-auto w-full flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
+                                >
+                                    <Icon
+                                        iconNode={Calendar}
+                                        className="h-6 w-6 transition-transform hover:scale-110"
+                                    />
+                                    <span className="text-sm font-medium">
+                                        Event & Kegiatan
+                                    </span>
+                                </Button>
+                            </Link>
                             <Button
                                 variant="outline"
-                                className="h-auto flex-col space-y-2 p-4"
+                                className="h-auto flex-col space-y-2 p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
                             >
-                                <Icon iconNode={Calendar} className="h-6 w-6" />
-                                <span className="text-sm font-medium">
-                                    Event & Kegiatan
-                                </span>
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="h-auto flex-col space-y-2 p-4"
-                            >
-                                <Icon iconNode={BookOpen} className="h-6 w-6" />
+                                <Icon
+                                    iconNode={BookOpen}
+                                    className="h-6 w-6 transition-transform hover:scale-110"
+                                />
                                 <span className="text-sm font-medium">
                                     Berita & Artikel
                                 </span>
