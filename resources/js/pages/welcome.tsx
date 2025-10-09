@@ -1,41 +1,21 @@
+import { Footer } from '@/components/footer';
 import { Icon } from '@/components/icon';
-import { Button } from '@/components/ui/button';
-import { useAppearance } from '@/hooks/use-appearance';
+import { StatisticsSection } from '@/components/statistics-section';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { activities, features, organizationInfo } from '@/data/ikapsi-data';
 import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
-    BookOpen,
-    Briefcase,
-    Calendar,
-    Heart,
-    HeartHandshake,
     Info,
     LayoutDashboard,
-    Mail,
-    MapPin,
-    Moon,
-    Newspaper,
-    Presentation,
-    Sun,
-    Trophy,
     UserPlus,
     Users,
 } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
-    const { appearance, updateAppearance } = useAppearance();
-
-    // Set default to light mode on first load
-    useEffect(() => {
-        const savedAppearance = localStorage.getItem('appearance');
-        if (!savedAppearance) {
-            updateAppearance('light');
-        }
-    }, [updateAppearance]);
 
     return (
         <>
@@ -53,16 +33,16 @@ export default function Welcome() {
                         {/* Logo and Brand */}
                         <div className="flex items-center gap-3">
                             <img
-                                src="/150px-Logo-baru_UHO.png"
-                                alt="Logo Ikatan Alumni Psikologi Universitas Halu Oleo"
+                                src={organizationInfo.logo}
+                                alt={`Logo ${organizationInfo.fullName}`}
                                 className="h-10 w-auto"
                             />
                             <div className="hidden md:block">
                                 <h2 className="text-lg leading-tight font-semibold">
-                                    IKAPSI UHO
+                                    {organizationInfo.shortName}
                                 </h2>
                                 <p className="text-xs text-muted-foreground">
-                                    Ikatan Alumni Psikologi
+                                    {organizationInfo.tagline}
                                 </p>
                             </div>
                         </div>
@@ -70,25 +50,7 @@ export default function Welcome() {
                         {/* Navigation */}
                         <nav className="flex items-center gap-2 lg:gap-4">
                             {/* Theme Toggle Button */}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() =>
-                                    updateAppearance(
-                                        appearance === 'dark'
-                                            ? 'light'
-                                            : 'dark',
-                                    )
-                                }
-                                className="h-9 w-9 rounded-md"
-                                aria-label="Toggle theme"
-                            >
-                                {appearance === 'dark' ? (
-                                    <Sun className="h-5 w-5" />
-                                ) : (
-                                    <Moon className="h-5 w-5" />
-                                )}
-                            </Button>
+                            <ThemeToggle />
 
                             {auth.user ? (
                                 <Link
@@ -187,44 +149,7 @@ export default function Welcome() {
                 </section>
 
                 {/* Statistics Section */}
-                <section className="border-y border-border bg-muted/30 py-12">
-                    <div className="container mx-auto px-4 lg:px-8">
-                        <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
-                            <div className="text-center">
-                                <div className="mb-2 text-3xl font-bold text-primary lg:text-4xl">
-                                    500+
-                                </div>
-                                <div className="text-sm text-muted-foreground lg:text-base">
-                                    Alumni Terdaftar
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="mb-2 text-3xl font-bold text-primary lg:text-4xl">
-                                    50+
-                                </div>
-                                <div className="text-sm text-muted-foreground lg:text-base">
-                                    Kegiatan per Tahun
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="mb-2 text-3xl font-bold text-primary lg:text-4xl">
-                                    20+
-                                </div>
-                                <div className="text-sm text-muted-foreground lg:text-base">
-                                    Mitra Kerja
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="mb-2 text-3xl font-bold text-primary lg:text-4xl">
-                                    15+
-                                </div>
-                                <div className="text-sm text-muted-foreground lg:text-base">
-                                    Tahun Berkarya
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <StatisticsSection />
 
                 {/* Features Section */}
                 <section id="tentang" className="py-20 lg:py-32">
@@ -239,107 +164,25 @@ export default function Welcome() {
                             </p>
                         </div>
                         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {/* Feature 1 */}
-                            <div className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <Icon
-                                        iconNode={Users}
-                                        className="h-6 w-6"
-                                    />
+                            {features.map((feature, index) => (
+                                <div
+                                    key={index}
+                                    className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg"
+                                >
+                                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <Icon
+                                            iconNode={feature.icon}
+                                            className="h-6 w-6"
+                                        />
+                                    </div>
+                                    <h3 className="mb-3 text-xl font-semibold">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-muted-foreground">
+                                        {feature.description}
+                                    </p>
                                 </div>
-                                <h3 className="mb-3 text-xl font-semibold">
-                                    Jaringan Alumni
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    Terhubung dengan ribuan alumni Psikologi UHO
-                                    dari berbagai angkatan dan profesi
-                                </p>
-                            </div>
-
-                            {/* Feature 2 */}
-                            <div className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <Icon
-                                        iconNode={Briefcase}
-                                        className="h-6 w-6"
-                                    />
-                                </div>
-                                <h3 className="mb-3 text-xl font-semibold">
-                                    Peluang Karir
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    Akses informasi lowongan pekerjaan dan
-                                    peluang kolaborasi profesional
-                                </p>
-                            </div>
-
-                            {/* Feature 3 */}
-                            <div className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <Icon
-                                        iconNode={Calendar}
-                                        className="h-6 w-6"
-                                    />
-                                </div>
-                                <h3 className="mb-3 text-xl font-semibold">
-                                    Kegiatan & Acara
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    Ikuti berbagai seminar, workshop, dan reuni
-                                    alumni yang menginspirasi
-                                </p>
-                            </div>
-
-                            {/* Feature 4 */}
-                            <div className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <Icon
-                                        iconNode={BookOpen}
-                                        className="h-6 w-6"
-                                    />
-                                </div>
-                                <h3 className="mb-3 text-xl font-semibold">
-                                    Pengembangan Diri
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    Program pelatihan dan pengembangan
-                                    kompetensi berkelanjutan
-                                </p>
-                            </div>
-
-                            {/* Feature 5 */}
-                            <div className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <Icon
-                                        iconNode={HeartHandshake}
-                                        className="h-6 w-6"
-                                    />
-                                </div>
-                                <h3 className="mb-3 text-xl font-semibold">
-                                    Kolaborasi & Mentoring
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    Bimbingan dari senior dan kesempatan
-                                    berkolaborasi dalam berbagai proyek
-                                </p>
-                            </div>
-
-                            {/* Feature 6 */}
-                            <div className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                    <Icon
-                                        iconNode={Newspaper}
-                                        className="h-6 w-6"
-                                    />
-                                </div>
-                                <h3 className="mb-3 text-xl font-semibold">
-                                    Informasi Terkini
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    Update berita dan perkembangan di dunia
-                                    psikologi serta alumni
-                                </p>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -357,62 +200,27 @@ export default function Welcome() {
                             </p>
                         </div>
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {/* Activity 1 */}
-                            <div className="overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg">
-                                <div className="bg-primary/10 p-6">
-                                    <Icon
-                                        iconNode={Presentation}
-                                        className="h-8 w-8 text-primary"
-                                    />
+                            {activities.map((activity, index) => (
+                                <div
+                                    key={index}
+                                    className="overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg"
+                                >
+                                    <div className="bg-primary/10 p-6">
+                                        <Icon
+                                            iconNode={activity.icon}
+                                            className="h-8 w-8 text-primary"
+                                        />
+                                    </div>
+                                    <div className="p-6">
+                                        <h3 className="mb-2 text-xl font-semibold">
+                                            {activity.title}
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            {activity.description}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="p-6">
-                                    <h3 className="mb-2 text-xl font-semibold">
-                                        Seminar & Workshop
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        Seminar rutin tentang perkembangan ilmu
-                                        psikologi dan praktik profesional
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Activity 2 */}
-                            <div className="overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg">
-                                <div className="bg-primary/10 p-6">
-                                    <Icon
-                                        iconNode={Trophy}
-                                        className="h-8 w-8 text-primary"
-                                    />
-                                </div>
-                                <div className="p-6">
-                                    <h3 className="mb-2 text-xl font-semibold">
-                                        Reuni Alumni
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        Acara reuni tahunan untuk mempererat
-                                        tali persaudaraan antar angkatan
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Activity 3 */}
-                            <div className="overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg">
-                                <div className="bg-primary/10 p-6">
-                                    <Icon
-                                        iconNode={Heart}
-                                        className="h-8 w-8 text-primary"
-                                    />
-                                </div>
-                                <div className="p-6">
-                                    <h3 className="mb-2 text-xl font-semibold">
-                                        Bakti Sosial
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        Program pengabdian masyarakat dan
-                                        kegiatan sosial bersama
-                                    </p>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -450,135 +258,7 @@ export default function Welcome() {
                 )}
 
                 {/* Footer */}
-                <footer className="border-t border-border bg-muted/30">
-                    <div className="container mx-auto px-4 py-12 lg:px-8">
-                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-                            {/* About */}
-                            <div>
-                                <div className="mb-4 flex items-center gap-3">
-                                    <img
-                                        src="/150px-Logo-baru_UHO.png"
-                                        alt="Logo IKAPSI UHO"
-                                        className="h-10 w-auto"
-                                    />
-                                    <div>
-                                        <h3 className="font-semibold">
-                                            IKAPSI UHO
-                                        </h3>
-                                        <p className="text-xs text-muted-foreground">
-                                            Ikatan Alumni Psikologi
-                                        </p>
-                                    </div>
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Wadah silaturahmi dan pengembangan
-                                    profesional alumni Psikologi Universitas
-                                    Halu Oleo
-                                </p>
-                            </div>
-
-                            {/* Quick Links */}
-                            <div>
-                                <h3 className="mb-4 font-semibold">
-                                    Tautan Cepat
-                                </h3>
-                                <ul className="space-y-2 text-sm">
-                                    <li>
-                                        <a
-                                            href="#tentang"
-                                            className="text-muted-foreground hover:text-foreground"
-                                        >
-                                            Tentang Kami
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={register()}
-                                            className="text-muted-foreground hover:text-foreground"
-                                        >
-                                            Pendaftaran
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={login()}
-                                            className="text-muted-foreground hover:text-foreground"
-                                        >
-                                            Login
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            {/* Contact */}
-                            <div>
-                                <h3 className="mb-4 font-semibold">Kontak</h3>
-                                <ul className="space-y-2 text-sm text-muted-foreground">
-                                    <li className="flex items-start gap-2">
-                                        <Icon
-                                            iconNode={Mail}
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
-                                        />
-                                        <span>ikapsiuho@gmail.com</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <Icon
-                                            iconNode={MapPin}
-                                            className="mt-0.5 h-4 w-4 flex-shrink-0"
-                                        />
-                                        <span>
-                                            Kampus UHO, Kendari, Sulawesi
-                                            Tenggara
-                                        </span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            {/* Social Media */}
-                            <div>
-                                <h3 className="mb-4 font-semibold">
-                                    Media Sosial
-                                </h3>
-                                <div className="flex gap-3">
-                                    <a
-                                        href="#"
-                                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"
-                                        aria-label="Facebook"
-                                    >
-                                        <span className="text-sm font-semibold">
-                                            f
-                                        </span>
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"
-                                        aria-label="Instagram"
-                                    >
-                                        <span className="text-sm font-semibold">
-                                            IG
-                                        </span>
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"
-                                        aria-label="Twitter"
-                                    >
-                                        <span className="text-sm font-semibold">
-                                            X
-                                        </span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-                            <p>
-                                &copy; {new Date().getFullYear()} IKAPSI UHO.
-                                Seluruh hak cipta dilindungi.
-                            </p>
-                        </div>
-                    </div>
-                </footer>
+                <Footer />
             </div>
         </>
     );
