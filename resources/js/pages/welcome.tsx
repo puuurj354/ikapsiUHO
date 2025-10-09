@@ -1,4 +1,6 @@
 import { Icon } from '@/components/icon';
+import { Button } from '@/components/ui/button';
+import { useAppearance } from '@/hooks/use-appearance';
 import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -13,15 +15,27 @@ import {
     LayoutDashboard,
     Mail,
     MapPin,
+    Moon,
     Newspaper,
     Presentation,
+    Sun,
     Trophy,
     UserPlus,
     Users,
 } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
+    const { appearance, updateAppearance } = useAppearance();
+
+    // Set default to light mode on first load
+    useEffect(() => {
+        const savedAppearance = localStorage.getItem('appearance');
+        if (!savedAppearance) {
+            updateAppearance('light');
+        }
+    }, [updateAppearance]);
 
     return (
         <>
@@ -55,6 +69,27 @@ export default function Welcome() {
 
                         {/* Navigation */}
                         <nav className="flex items-center gap-2 lg:gap-4">
+                            {/* Theme Toggle Button */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() =>
+                                    updateAppearance(
+                                        appearance === 'dark'
+                                            ? 'light'
+                                            : 'dark',
+                                    )
+                                }
+                                className="h-9 w-9 rounded-md"
+                                aria-label="Toggle theme"
+                            >
+                                {appearance === 'dark' ? (
+                                    <Sun className="h-5 w-5" />
+                                ) : (
+                                    <Moon className="h-5 w-5" />
+                                )}
+                            </Button>
+
                             {auth.user ? (
                                 <Link
                                     href={dashboard()}
