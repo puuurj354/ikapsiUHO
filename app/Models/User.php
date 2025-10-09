@@ -111,7 +111,7 @@ class User extends Authenticatable
         if ($this->profile_picture) {
             return asset('storage/' . $this->profile_picture);
         }
-        
+
         // Return default avatar based on name initial
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
     }

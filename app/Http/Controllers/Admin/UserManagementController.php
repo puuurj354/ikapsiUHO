@@ -122,7 +122,7 @@ class UserManagementController extends Controller
     {
         /** @var User $authUser */
         $authUser = Auth::user();
-        
+
         if ($user->id === $authUser->id) {
             return back()->with('error', 'Tidak dapat menghapus akun sendiri.');
         }

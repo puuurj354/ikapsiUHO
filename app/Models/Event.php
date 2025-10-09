@@ -68,7 +68,7 @@ class Event extends Model
         if (!$this->max_participants) {
             return false;
         }
-        
+
         return $this->registration_count >= $this->max_participants;
     }
 
