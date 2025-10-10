@@ -11,9 +11,11 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as notificationsIndex } from '@/routes/notifications';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
+    Bell,
     BookOpen,
     Calendar,
     Folder,
@@ -62,6 +64,11 @@ export function AppSidebar() {
                   href: '/forum',
                   icon: MessageSquare,
               },
+              {
+                  title: 'Notifikasi',
+                  href: notificationsIndex(),
+                  icon: Bell,
+              },
           ]
         : [
               {
@@ -83,6 +90,11 @@ export function AppSidebar() {
                   title: 'Forum Diskusi',
                   href: '/forum',
                   icon: MessageSquare,
+              },
+              {
+                  title: 'Notifikasi',
+                  href: notificationsIndex(),
+                  icon: Bell,
               },
           ];
 

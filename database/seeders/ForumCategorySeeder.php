@@ -20,6 +20,7 @@ class ForumCategorySeeder extends Seeder
                 'icon' => 'MessageSquare',
                 'color' => '#3b82f6',
                 'order' => 1,
+                'is_active' => true,
             ],
             [
                 'name' => 'Karir & Pekerjaan',
@@ -28,6 +29,7 @@ class ForumCategorySeeder extends Seeder
                 'icon' => 'Briefcase',
                 'color' => '#10b981',
                 'order' => 2,
+                'is_active' => true,
             ],
             [
                 'name' => 'Akademik',
@@ -36,6 +38,7 @@ class ForumCategorySeeder extends Seeder
                 'icon' => 'GraduationCap',
                 'color' => '#8b5cf6',
                 'order' => 3,
+                'is_active' => true,
             ],
             [
                 'name' => 'Event & Kegiatan',
@@ -44,6 +47,7 @@ class ForumCategorySeeder extends Seeder
                 'icon' => 'Calendar',
                 'color' => '#f59e0b',
                 'order' => 4,
+                'is_active' => true,
             ],
             [
                 'name' => 'Wirausaha',
@@ -52,6 +56,7 @@ class ForumCategorySeeder extends Seeder
                 'icon' => 'TrendingUp',
                 'color' => '#ec4899',
                 'order' => 5,
+                'is_active' => true,
             ],
             [
                 'name' => 'Sosial & Komunitas',
@@ -60,6 +65,7 @@ class ForumCategorySeeder extends Seeder
                 'icon' => 'Users',
                 'color' => '#06b6d4',
                 'order' => 6,
+                'is_active' => true,
             ],
             [
                 'name' => 'Tanya Jawab',
@@ -68,11 +74,17 @@ class ForumCategorySeeder extends Seeder
                 'icon' => 'HelpCircle',
                 'color' => '#f97316',
                 'order' => 7,
+                'is_active' => true,
             ],
         ];
 
         foreach ($categories as $category) {
-            ForumCategory::create($category);
+            ForumCategory::firstOrCreate(
+                ['slug' => $category['slug']],
+                $category
+            );
         }
+
+        $this->command->info('✅ 7 forum categories created successfully!');
     }
 }

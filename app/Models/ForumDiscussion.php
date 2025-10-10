@@ -90,6 +90,14 @@ class ForumDiscussion extends Model
     }
 
     /**
+     * Get the reports for the discussion.
+     */
+    public function reports(): MorphMany
+    {
+        return $this->morphMany(ForumReport::class, 'reportable');
+    }
+
+    /**
      * Check if the discussion is liked by the current user.
      */
     public function getIsLikedByCurrentUserAttribute(): bool

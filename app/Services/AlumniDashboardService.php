@@ -18,6 +18,7 @@ class AlumniDashboardService
             'user_profile' => [
                 'name' => $user->name,
                 'email' => $user->email,
+                'profile_picture_url' => $user->profile_picture_url,
                 'angkatan' => $user->angkatan,
                 'profesi' => $user->profesi,
                 'bio' => $user->bio,
@@ -55,7 +56,7 @@ class AlumniDashboardService
     public function getAlumniDirectory(?string $search = null, ?string $angkatan = null, ?string $profesi = null, int $limit = 20): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = User::alumni()
-            ->select(['id', 'name', 'email', 'angkatan', 'profesi', 'bio', 'created_at']);
+            ->select(['id', 'name', 'email', 'profile_picture', 'angkatan', 'profesi', 'bio', 'created_at']);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -73,7 +74,17 @@ class AlumniDashboardService
         }
 
         return $query->orderBy('name')
-                    ->paginate($limit);
+                    ->paginate($limit)
+                    ->through(fn ($user) => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'angkatan' => $user->angkatan,
+                        'profesi' => $user->profesi,
+                        'bio' => $user->bio,
+                        'profile_picture_url' => $user->profile_picture_url,
+                        'created_at' => $user->created_at,
+                    ]);
     }
 
     /**

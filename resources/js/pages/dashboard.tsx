@@ -1,5 +1,6 @@
 import { Icon } from '@/components/icon';
 import { ProfileUpdateModal } from '@/components/profile-update-modal';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +30,7 @@ import { useState } from 'react';
 interface UserProfile {
     name: string;
     email: string;
+    profile_picture_url: string;
     angkatan: string | null;
     profesi: string | null;
     bio: string | null;
@@ -158,6 +160,29 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <div className="mb-6 flex items-center space-x-4">
+                            <Avatar className="h-20 w-20">
+                                <AvatarImage
+                                    src={user_profile.profile_picture_url}
+                                />
+                                <AvatarFallback className="text-lg">
+                                    {user_profile.name
+                                        .split(' ')
+                                        .map((n) => n[0])
+                                        .join('')
+                                        .toUpperCase()
+                                        .slice(0, 2)}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <h3 className="text-lg font-semibold">
+                                    {user_profile.name}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {user_profile.email}
+                                </p>
+                            </div>
+                        </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <div className="space-y-1">
                                 <p className="text-sm font-medium text-muted-foreground">

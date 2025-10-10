@@ -23,6 +23,15 @@ class DatabaseSeeder extends Seeder
         // Seed events
         $this->call(EventSeeder::class);
 
+        // Seed forum categories
+        $this->call(ForumCategorySeeder::class);
+
+        // Seed forum discussions
+        $this->call(ForumDiscussionSeeder::class);
+
+        // Seed forum reports
+        $this->call(ForumReportSeeder::class);
+
         // Create additional test user if needed
         User::firstOrCreate(
             ['email' => 'test@example.com'],

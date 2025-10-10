@@ -6,6 +6,8 @@ use App\Models\ForumCategory;
 use App\Models\ForumDiscussion;
 use App\Models\ForumLike;
 use App\Models\ForumReply;
+use App\Notifications\ForumLikeNotification;
+use App\Notifications\ForumReplyNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +22,9 @@ class ForumService
         $categoryId = $request->input('category');
         $sort = $request->input('sort', 'recent'); // recent, popular, oldest
 
-        $query = ForumDiscussion::with(['user', 'category'])
+        $query = ForumDiscussion::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }, 'category'])
             ->withCount('replies');
 
         if ($search) {
@@ -49,7 +53,9 @@ class ForumService
         }
 
         // Pinned discussions always on top
-        $pinnedDiscussions = ForumDiscussion::with(['user', 'category'])
+        $pinnedDiscussions = ForumDiscussion::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }, 'category'])
             ->withCount('replies')
             ->pinned()
             ->get();
@@ -97,24 +103,70 @@ class ForumService
      */
     public function getDiscussionData(string $slug): array
     {
-        $discussion = ForumDiscussion::with(['user', 'category'])
-            ->withCount('replies', 'likes')
+        $discussion = ForumDiscussion::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }, 'category'])
             ->where('slug', $slug)
             ->firstOrFail();
 
-        // Increment views
-        $discussion->incrementViews();
+        // Track unique view per user
+        $this->trackView($discussion);
 
-        $replies = ForumReply::with(['user'])
+        // Get all replies (including nested ones) with user relationship
+        $replies = ForumReply::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }])
             ->where('forum_discussion_id', $discussion->id)
-            ->whereNull('parent_id')
+            ->orderBy('parent_id', 'asc') // Parent replies first
             ->orderBy('created_at', 'asc')
-            ->paginate(20);
+            ->get();
+
+        // Add user_liked flag to discussion
+        $discussion->user_liked = ForumLike::where('user_id', Auth::id())
+            ->where('likeable_type', ForumDiscussion::class)
+            ->where('likeable_id', $discussion->id)
+            ->exists();
+
+        // Add user_liked flag to each reply
+        $replies->each(function ($reply) {
+            $reply->user_liked = ForumLike::where('user_id', Auth::id())
+                ->where('likeable_type', ForumReply::class)
+                ->where('likeable_id', $reply->id)
+                ->exists();
+        });
+
+        $user = Auth::user();
 
         return [
             'discussion' => $discussion,
             'replies' => $replies,
+            'canEdit' => $discussion->user_id === $user->id || $user->isAdmin(),
+            'canDelete' => $discussion->user_id === $user->id || $user->isAdmin(),
+            'isAdmin' => $user->isAdmin(),
         ];
+    }
+
+    /**
+     * Track view for a discussion (one view per user).
+     */
+    private function trackView(ForumDiscussion $discussion): void
+    {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            return;
+        }
+
+        // Use firstOrCreate to ensure only one view per user per discussion
+        \App\Models\ForumView::firstOrCreate([
+            'user_id' => $userId,
+            'discussion_id' => $discussion->id,
+        ]);
+
+        // Update views_count on discussion
+        $discussion->update([
+            'views_count' => \App\Models\ForumView::where('discussion_id', $discussion->id)->count()
+        ]);
     }
 
     /**
@@ -174,6 +226,13 @@ class ForumService
         // Update discussion
         $discussion->updateRepliesCount();
 
+        // Send notification to discussion owner (if not replying to own discussion)
+        if ($discussion->user_id !== Auth::id()) {
+            $discussion->user->notify(
+                new ForumReplyNotification($reply, $discussion, Auth::user())
+            );
+        }
+
         return $reply;
     }
 
@@ -182,7 +241,8 @@ class ForumService
      */
     public function toggleDiscussionLike(ForumDiscussion $discussion): void
     {
-        $existingLike = ForumLike::where('user_id', Auth::id())
+        $currentUser = Auth::user();
+        $existingLike = ForumLike::where('user_id', $currentUser->id)
             ->where('likeable_type', ForumDiscussion::class)
             ->where('likeable_id', $discussion->id)
             ->first();
@@ -191,10 +251,23 @@ class ForumService
             $existingLike->delete();
         } else {
             ForumLike::create([
-                'user_id' => Auth::id(),
+                'user_id' => $currentUser->id,
                 'likeable_type' => ForumDiscussion::class,
                 'likeable_id' => $discussion->id,
             ]);
+
+            // Send notification to discussion owner (if not liking own discussion)
+            if ($discussion->user_id !== $currentUser->id) {
+                $discussion->user->notify(
+                    new ForumLikeNotification(
+                        $currentUser,
+                        ForumDiscussion::class,
+                        $discussion->id,
+                        "diskusi Anda \"{$discussion->title}\"",
+                        "/forum/{$discussion->slug}"
+                    )
+                );
+            }
         }
 
         $discussion->updateLikesCount();
@@ -205,7 +278,8 @@ class ForumService
      */
     public function toggleReplyLike(ForumReply $reply): void
     {
-        $existingLike = ForumLike::where('user_id', Auth::id())
+        $currentUser = Auth::user();
+        $existingLike = ForumLike::where('user_id', $currentUser->id)
             ->where('likeable_type', ForumReply::class)
             ->where('likeable_id', $reply->id)
             ->first();
@@ -214,10 +288,23 @@ class ForumService
             $existingLike->delete();
         } else {
             ForumLike::create([
-                'user_id' => Auth::id(),
+                'user_id' => $currentUser->id,
                 'likeable_type' => ForumReply::class,
                 'likeable_id' => $reply->id,
             ]);
+
+            // Send notification to reply owner (if not liking own reply)
+            if ($reply->user_id !== $currentUser->id) {
+                $reply->user->notify(
+                    new ForumLikeNotification(
+                        $currentUser,
+                        ForumReply::class,
+                        $reply->id,
+                        "balasan Anda",
+                        "/forum/{$reply->discussion->slug}"
+                    )
+                );
+            }
         }
 
         $reply->updateLikesCount();

@@ -1,0 +1,889 @@
+import { ReportModal } from '@/components/forum/report-modal';
+import { Icon } from '@/components/icon';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import {
+    AlertCircle,
+    ChevronDown,
+    ChevronRight,
+    Edit2,
+    Eye,
+    Flag,
+    Heart,
+    Loader2,
+    Lock,
+    MessageSquare,
+    MoreVertical,
+    Pin,
+    Send,
+    Trash2,
+} from 'lucide-react';
+import React from 'react';
+
+interface User {
+    id: number;
+    name: string;
+    profile_picture_url: string;
+    role?: string;
+}
+
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    color: string;
+}
+
+interface Reply {
+    id: number;
+    content: string;
+    created_at: string;
+    likes_count: number;
+    user_liked: boolean;
+    parent_id: number | null;
+    user: User;
+}
+
+interface Discussion {
+    id: number;
+    title: string;
+    slug: string;
+    content: string;
+    is_pinned: boolean;
+    is_locked: boolean;
+    views_count: number;
+    replies_count: number;
+    likes_count: number;
+    user_liked: boolean;
+    created_at: string;
+    updated_at: string;
+    user: User;
+    category: Category;
+}
+
+interface Props {
+    discussion: Discussion;
+    replies: Reply[];
+    canEdit: boolean;
+    canDelete: boolean;
+    isAdmin: boolean;
+}
+
+export default function ShowDiscussion({
+    discussion,
+    replies,
+    canEdit,
+    canDelete,
+    isAdmin,
+}: Props) {
+    const { auth } = usePage<SharedData>().props;
+    const currentUserId = auth.user.id;
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        content: '',
+        parent_id: null as number | null,
+    });
+
+    // Report Modal State
+    const [reportModal, setReportModal] = React.useState<{
+        isOpen: boolean;
+        reportableType:
+            | 'App\\Models\\ForumDiscussion'
+            | 'App\\Models\\ForumReply';
+        reportableId: number;
+        title?: string;
+    }>({
+        isOpen: false,
+        reportableType: 'App\\Models\\ForumDiscussion',
+        reportableId: 0,
+        title: undefined,
+    });
+
+    // Reply Target State (untuk nested replies)
+    const [replyingTo, setReplyingTo] = React.useState<{
+        id: number;
+        userName: string;
+    } | null>(null);
+
+    // Collapse state untuk nested replies
+    const [collapsedReplies, setCollapsedReplies] = React.useState<Set<number>>(
+        new Set(),
+    );
+
+    // Organize replies into parent-children structure
+    const organizedReplies = React.useMemo(() => {
+        const parentReplies = replies.filter((r) => !r.parent_id);
+        return parentReplies.map((parent) => ({
+            parent,
+            children: replies.filter((r) => r.parent_id === parent.id),
+        }));
+    }, [replies]);
+
+    const toggleCollapseReplies = (replyId: number) => {
+        setCollapsedReplies((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(replyId)) {
+                newSet.delete(replyId);
+            } else {
+                newSet.add(replyId);
+            }
+            return newSet;
+        });
+    };
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'Forum Diskusi', href: '/forum/${discussion.slug}' },
+        { title: discussion.title, href: `/forum/${discussion.slug}` },
+    ];
+
+    const openReportModal = (
+        type: 'App\\Models\\ForumDiscussion' | 'App\\Models\\ForumReply',
+        id: number,
+        title?: string,
+    ) => {
+        setReportModal({
+            isOpen: true,
+            reportableType: type,
+            reportableId: id,
+            title,
+        });
+    };
+
+    const closeReportModal = () => {
+        setReportModal({
+            isOpen: false,
+            reportableType: 'App\\Models\\ForumDiscussion',
+            reportableId: 0,
+            title: undefined,
+        });
+    };
+
+    const handleLikeDiscussion = () => {
+        router.post(
+            `/forum/${discussion.slug}/like`,
+            {},
+            { preserveScroll: true },
+        );
+    };
+
+    const handleLikeReply = (replyId: number) => {
+        router.post(
+            `/forum/reply/${replyId}/like`,
+            {},
+            { preserveScroll: true },
+        );
+    };
+
+    const handleTogglePin = () => {
+        router.post(
+            `/forum/${discussion.slug}/pin`,
+            {},
+            { preserveScroll: true },
+        );
+    };
+
+    const handleToggleLock = () => {
+        router.post(
+            `/forum/${discussion.slug}/lock`,
+            {},
+            { preserveScroll: true },
+        );
+    };
+
+    const handleDelete = () => {
+        if (
+            confirm(
+                'Apakah Anda yakin ingin menghapus diskusi ini? Tindakan ini tidak dapat dibatalkan.',
+            )
+        ) {
+            router.delete(`/forum/${discussion.slug}`);
+        }
+    };
+
+    const handleSubmitReply = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(`/forum/${discussion.slug}/reply`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                reset();
+                setReplyingTo(null); // Clear reply target after successful submit
+            },
+        });
+    };
+
+    const handleReplyToUser = (replyId: number, userName: string) => {
+        setReplyingTo({ id: replyId, userName });
+        setData('parent_id', replyId);
+        // Scroll to reply form
+        document
+            .getElementById('reply-form')
+            ?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const cancelReply = () => {
+        setReplyingTo(null);
+        setData('parent_id', null);
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(date);
+    };
+
+    const getInitials = (name: string) => {
+        return name
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={`${discussion.title} - Forum`} />
+
+            <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 md:px-6">
+                {/* Back Button */}
+                <Link href="/forum">
+                    <Button variant="ghost" size="sm">
+                        <Icon iconNode={Eye} className="mr-2 h-4 w-4" />
+                        Kembali ke Forum
+                    </Button>
+                </Link>
+
+                {/* Discussion Card */}
+                <Card>
+                    <CardHeader className="space-y-4">
+                        {/* Category & Badges */}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge
+                                variant="secondary"
+                                style={{
+                                    backgroundColor: `${discussion.category.color}20`,
+                                    color: discussion.category.color,
+                                }}
+                            >
+                                {discussion.category.name}
+                            </Badge>
+                            {discussion.is_pinned && (
+                                <Badge
+                                    variant="default"
+                                    className="bg-blue-600"
+                                >
+                                    <Pin className="mr-1 h-3 w-3" />
+                                    Disematkan
+                                </Badge>
+                            )}
+                            {discussion.is_locked && (
+                                <Badge variant="destructive">
+                                    <Lock className="mr-1 h-3 w-3" />
+                                    Dikunci
+                                </Badge>
+                            )}
+                        </div>
+
+                        {/* Title */}
+                        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+                            {discussion.title}
+                        </h1>
+
+                        {/* Meta Info */}
+                        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
+                            <div className="flex items-center gap-3 sm:gap-4">
+                                <Avatar className="h-10 w-10 flex-shrink-0">
+                                    <AvatarImage
+                                        src={
+                                            discussion.user.profile_picture_url
+                                        }
+                                    />
+                                    <AvatarFallback>
+                                        {getInitials(discussion.user.name)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <p className="truncate font-medium text-gray-900">
+                                            {discussion.user.name}
+                                        </p>
+                                        {discussion.user.role === 'admin' && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="flex-shrink-0 bg-purple-100 text-purple-700"
+                                            >
+                                                Admin
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 sm:text-sm">
+                                        {formatDate(discussion.created_at)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Action Menu */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex-shrink-0"
+                                    >
+                                        <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    {canEdit && (
+                                        <DropdownMenuItem asChild>
+                                            <Link
+                                                href={`/forum/${discussion.slug}/edit`}
+                                            >
+                                                <Edit2 className="mr-2 h-4 w-4" />
+                                                Edit Diskusi
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                    {isAdmin && (
+                                        <>
+                                            {canEdit && (
+                                                <DropdownMenuSeparator />
+                                            )}
+                                            <DropdownMenuItem
+                                                onClick={handleTogglePin}
+                                            >
+                                                <Pin className="mr-2 h-4 w-4" />
+                                                {discussion.is_pinned
+                                                    ? 'Lepas Pin'
+                                                    : 'Pin'}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={handleToggleLock}
+                                            >
+                                                <Lock className="mr-2 h-4 w-4" />
+                                                {discussion.is_locked
+                                                    ? 'Buka Kunci'
+                                                    : 'Kunci'}
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+                                    {canDelete && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={handleDelete}
+                                                className="text-red-600"
+                                            >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Hapus Diskusi
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+
+                                    {/* Report Button - Only show if not own content */}
+                                    {currentUserId !== discussion.user.id && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    openReportModal(
+                                                        'App\\Models\\ForumDiscussion',
+                                                        discussion.id,
+                                                        discussion.title,
+                                                    )
+                                                }
+                                                className="text-amber-600"
+                                            >
+                                                <Flag className="mr-2 h-4 w-4" />
+                                                Laporkan Diskusi
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-4 sm:space-y-6">
+                        {/* Content */}
+                        <div className="prose prose-sm sm:prose max-w-none text-gray-700">
+                            {discussion.content
+                                .split('\n')
+                                .map((paragraph, index) => (
+                                    <p key={index}>{paragraph}</p>
+                                ))}
+                        </div>
+
+                        {/* Stats & Actions */}
+                        <div className="flex flex-col items-start justify-between gap-3 border-t pt-4 sm:flex-row sm:items-center sm:gap-0">
+                            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 sm:gap-6 sm:text-sm">
+                                <div className="flex items-center gap-1">
+                                    <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    <span>{discussion.views_count} views</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    <span>
+                                        {discussion.replies_count} balasan
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    <span>{discussion.likes_count} likes</span>
+                                </div>
+                            </div>
+
+                            <Button
+                                variant={
+                                    discussion.user_liked
+                                        ? 'default'
+                                        : 'outline'
+                                }
+                                size="sm"
+                                onClick={handleLikeDiscussion}
+                                className={
+                                    discussion.user_liked
+                                        ? 'bg-red-500 hover:bg-red-600'
+                                        : ''
+                                }
+                            >
+                                <Heart
+                                    className={`mr-2 h-4 w-4 ${discussion.user_liked ? 'fill-current' : ''}`}
+                                />
+                                {discussion.user_liked ? 'Liked' : 'Like'}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Replies Section */}
+                <Card>
+                    <CardHeader>
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            {discussion.replies_count} Balasan
+                        </h2>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {/* Reply Form */}
+                        {!discussion.is_locked ? (
+                            <form
+                                id="reply-form"
+                                onSubmit={handleSubmitReply}
+                                className="space-y-4"
+                            >
+                                {/* Reply Target Indicator */}
+                                {replyingTo && (
+                                    <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900/50 dark:bg-blue-950/30">
+                                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                                            <MessageSquare className="h-3 w-3 flex-shrink-0 text-blue-600 sm:h-4 sm:w-4 dark:text-blue-400" />
+                                            <span className="truncate text-blue-900 dark:text-blue-100">
+                                                Membalas{' '}
+                                                <span className="font-semibold">
+                                                    {replyingTo.userName}
+                                                </span>
+                                            </span>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={cancelReply}
+                                            className="h-auto flex-shrink-0 p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                                        >
+                                            <Icon
+                                                iconNode={Trash2}
+                                                className="h-3 w-3 sm:h-4 sm:w-4"
+                                            />
+                                        </Button>
+                                    </div>
+                                )}
+
+                                <Textarea
+                                    placeholder={
+                                        replyingTo
+                                            ? `Balas ${replyingTo.userName}...`
+                                            : 'Tulis balasan Anda...'
+                                    }
+                                    value={data.content}
+                                    onChange={(e) =>
+                                        setData('content', e.target.value)
+                                    }
+                                    className={
+                                        errors.content
+                                            ? 'min-h-[100px] border-red-500 sm:min-h-[120px]'
+                                            : 'min-h-[100px] sm:min-h-[120px]'
+                                    }
+                                />
+                                {errors.content && (
+                                    <div className="flex items-center gap-1 text-xs text-red-500 sm:text-sm">
+                                        <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                                        <span>{errors.content}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-end">
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        {processing ? (
+                                            <>
+                                                <Icon
+                                                    iconNode={Loader2}
+                                                    className="mr-2 h-4 w-4 animate-spin"
+                                                />
+                                                <span className="hidden sm:inline">
+                                                    Mengirim...
+                                                </span>
+                                                <span className="sm:hidden">
+                                                    Kirim...
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Send className="mr-2 h-4 w-4" />
+                                                <span className="hidden sm:inline">
+                                                    Kirim Balasan
+                                                </span>
+                                                <span className="sm:hidden">
+                                                    Kirim
+                                                </span>
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="flex items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-yellow-800">
+                                <Lock className="h-5 w-5" />
+                                <p className="font-medium">
+                                    Diskusi ini telah dikunci. Tidak dapat
+                                    menambahkan balasan baru.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Replies List */}
+                        {replies.length > 0 ? (
+                            <div className="space-y-4">
+                                {organizedReplies.map(
+                                    ({ parent, children }) => (
+                                        <div
+                                            key={parent.id}
+                                            className="space-y-3"
+                                        >
+                                            {/* Parent Reply */}
+                                            <div className="rounded-lg border bg-gray-50 p-4">
+                                                <div className="flex items-start gap-3">
+                                                    <Avatar className="h-10 w-10 flex-shrink-0">
+                                                        <AvatarImage
+                                                            src={
+                                                                parent.user
+                                                                    .profile_picture_url
+                                                            }
+                                                        />
+                                                        <AvatarFallback>
+                                                            {getInitials(
+                                                                parent.user
+                                                                    .name,
+                                                            )}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="min-w-0 flex-1 space-y-2">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <p className="font-medium text-gray-900">
+                                                                {
+                                                                    parent.user
+                                                                        .name
+                                                                }
+                                                            </p>
+                                                            {parent.user
+                                                                .role ===
+                                                                'admin' && (
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className="bg-purple-100 text-purple-700"
+                                                                >
+                                                                    Admin
+                                                                </Badge>
+                                                            )}
+                                                            <span className="text-sm text-gray-500">
+                                                                •
+                                                            </span>
+                                                            <span className="text-sm text-gray-500">
+                                                                {formatDate(
+                                                                    parent.created_at,
+                                                                )}
+                                                            </span>
+                                                        </div>
+
+                                                        <p className="break-words text-gray-700">
+                                                            {parent.content}
+                                                        </p>
+
+                                                        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    handleLikeReply(
+                                                                        parent.id,
+                                                                    )
+                                                                }
+                                                                className={
+                                                                    parent.user_liked
+                                                                        ? 'text-red-500'
+                                                                        : ''
+                                                                }
+                                                            >
+                                                                <Heart
+                                                                    className={`mr-1 h-4 w-4 ${parent.user_liked ? 'fill-current' : ''}`}
+                                                                />
+                                                                {
+                                                                    parent.likes_count
+                                                                }
+                                                            </Button>
+
+                                                            {!discussion.is_locked && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        handleReplyToUser(
+                                                                            parent.id,
+                                                                            parent
+                                                                                .user
+                                                                                .name,
+                                                                        )
+                                                                    }
+                                                                    className="text-blue-600 hover:text-blue-700"
+                                                                >
+                                                                    <MessageSquare className="mr-1 h-4 w-4" />
+                                                                    Balas
+                                                                </Button>
+                                                            )}
+
+                                                            {currentUserId !==
+                                                                parent.user
+                                                                    .id && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        openReportModal(
+                                                                            'App\\Models\\ForumReply',
+                                                                            parent.id,
+                                                                            `Balasan dari ${parent.user.name}`,
+                                                                        )
+                                                                    }
+                                                                    className="text-amber-600 hover:text-amber-700"
+                                                                >
+                                                                    <Flag className="mr-1 h-4 w-4" />
+                                                                    <span className="hidden sm:inline">
+                                                                        Laporkan
+                                                                    </span>
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Nested Replies with Collapse */}
+                                            {children.length > 0 && (
+                                                <div className="ml-6 space-y-3 sm:ml-12">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            toggleCollapseReplies(
+                                                                parent.id,
+                                                            )
+                                                        }
+                                                        className="text-sm text-blue-600 hover:text-blue-700"
+                                                    >
+                                                        {collapsedReplies.has(
+                                                            parent.id,
+                                                        ) ? (
+                                                            <ChevronRight className="mr-1 h-4 w-4" />
+                                                        ) : (
+                                                            <ChevronDown className="mr-1 h-4 w-4" />
+                                                        )}
+                                                        {collapsedReplies.has(
+                                                            parent.id,
+                                                        )
+                                                            ? `Tampilkan ${children.length} balasan`
+                                                            : `Sembunyikan ${children.length} balasan`}
+                                                    </Button>
+
+                                                    {!collapsedReplies.has(
+                                                        parent.id,
+                                                    ) &&
+                                                        children.map(
+                                                            (child) => (
+                                                                <div
+                                                                    key={
+                                                                        child.id
+                                                                    }
+                                                                    className="rounded-lg border border-l-4 border-l-blue-400 bg-blue-50/50 p-3 sm:p-4"
+                                                                >
+                                                                    <div className="flex items-start gap-2 sm:gap-3">
+                                                                        <Avatar className="h-8 w-8 flex-shrink-0">
+                                                                            <AvatarImage
+                                                                                src={
+                                                                                    child
+                                                                                        .user
+                                                                                        .profile_picture_url
+                                                                                }
+                                                                            />
+                                                                            <AvatarFallback>
+                                                                                {getInitials(
+                                                                                    child
+                                                                                        .user
+                                                                                        .name,
+                                                                                )}
+                                                                            </AvatarFallback>
+                                                                        </Avatar>
+                                                                        <div className="min-w-0 flex-1 space-y-2">
+                                                                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                                                                                <p className="font-medium text-gray-900">
+                                                                                    {
+                                                                                        child
+                                                                                            .user
+                                                                                            .name
+                                                                                    }
+                                                                                </p>
+                                                                                {child
+                                                                                    .user
+                                                                                    .role ===
+                                                                                    'admin' && (
+                                                                                    <Badge
+                                                                                        variant="secondary"
+                                                                                        className="bg-purple-100 text-xs text-purple-700"
+                                                                                    >
+                                                                                        Admin
+                                                                                    </Badge>
+                                                                                )}
+                                                                                <span className="text-xs text-gray-500">
+                                                                                    •
+                                                                                </span>
+                                                                                <span className="text-xs text-gray-500">
+                                                                                    {formatDate(
+                                                                                        child.created_at,
+                                                                                    )}
+                                                                                </span>
+                                                                            </div>
+
+                                                                            <div className="flex items-center gap-1 text-xs text-blue-600">
+                                                                                <MessageSquare className="h-3 w-3" />
+                                                                                <span>
+                                                                                    Membalas{' '}
+                                                                                    {
+                                                                                        parent
+                                                                                            .user
+                                                                                            .name
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+
+                                                                            <p className="text-sm break-words text-gray-700">
+                                                                                {
+                                                                                    child.content
+                                                                                }
+                                                                            </p>
+
+                                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                                <Button
+                                                                                    variant="ghost"
+                                                                                    size="sm"
+                                                                                    onClick={() =>
+                                                                                        handleLikeReply(
+                                                                                            child.id,
+                                                                                        )
+                                                                                    }
+                                                                                    className={`text-xs ${child.user_liked ? 'text-red-500' : ''}`}
+                                                                                >
+                                                                                    <Heart
+                                                                                        className={`mr-1 h-3 w-3 ${child.user_liked ? 'fill-current' : ''}`}
+                                                                                    />
+                                                                                    {
+                                                                                        child.likes_count
+                                                                                    }
+                                                                                </Button>
+
+                                                                                {currentUserId !==
+                                                                                    child
+                                                                                        .user
+                                                                                        .id && (
+                                                                                    <Button
+                                                                                        variant="ghost"
+                                                                                        size="sm"
+                                                                                        onClick={() =>
+                                                                                            openReportModal(
+                                                                                                'App\\Models\\ForumReply',
+                                                                                                child.id,
+                                                                                                `Balasan dari ${child.user.name}`,
+                                                                                            )
+                                                                                        }
+                                                                                        className="text-xs text-amber-600 hover:text-amber-700"
+                                                                                    >
+                                                                                        <Flag className="mr-1 h-3 w-3" />
+                                                                                        <span className="hidden sm:inline">
+                                                                                            Laporkan
+                                                                                        </span>
+                                                                                    </Button>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ),
+                                )}
+                            </div>
+                        ) : (
+                            <div className="py-12 text-center">
+                                <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
+                                <p className="mt-2 text-gray-500">
+                                    Belum ada balasan. Jadilah yang pertama!
+                                </p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                {/* Report Modal */}
+                <ReportModal
+                    isOpen={reportModal.isOpen}
+                    onClose={closeReportModal}
+                    reportableType={reportModal.reportableType}
+                    reportableId={reportModal.reportableId}
+                    reportedItemTitle={reportModal.title}
+                />
+            </div>
+        </AppLayout>
+    );
+}

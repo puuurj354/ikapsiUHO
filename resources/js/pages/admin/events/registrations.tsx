@@ -1,4 +1,5 @@
 import { Icon } from '@/components/icon';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -307,17 +308,29 @@ export default function EventRegistrations({ event, registrations }: Props) {
                                         {registrations.map((registration) => (
                                             <TableRow key={registration.id}>
                                                 <TableCell>
-                                                    <img
-                                                        src={
-                                                            registration.user
-                                                                .profile_picture_url
-                                                        }
-                                                        alt={
-                                                            registration.user
-                                                                .name
-                                                        }
-                                                        className="h-10 w-10 rounded-full object-cover"
-                                                    />
+                                                    <Avatar className="h-10 w-10">
+                                                        <AvatarImage
+                                                            src={
+                                                                registration
+                                                                    .user
+                                                                    .profile_picture_url
+                                                            }
+                                                            alt={
+                                                                registration
+                                                                    .user.name
+                                                            }
+                                                        />
+                                                        <AvatarFallback>
+                                                            {registration.user.name
+                                                                .split(' ')
+                                                                .map(
+                                                                    (n) => n[0],
+                                                                )
+                                                                .join('')
+                                                                .toUpperCase()
+                                                                .slice(0, 2)}
+                                                        </AvatarFallback>
+                                                    </Avatar>
                                                 </TableCell>
                                                 <TableCell className="font-medium">
                                                     {registration.user.name}
