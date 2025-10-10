@@ -1,3 +1,4 @@
+import { ReportModal } from '@/components/forum/report-modal';
 import { Icon } from '@/components/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,7 @@ import {
     AlertCircle,
     Edit2,
     Eye,
+    Flag,
     Heart,
     Loader2,
     Lock,
@@ -27,6 +29,7 @@ import {
     Send,
     Trash2,
 } from 'lucide-react';
+import React from 'react';
 
 interface User {
     id: number;
@@ -88,11 +91,48 @@ export default function ShowDiscussion({
         parent_id: null as number | null,
     });
 
+    // Report Modal State
+    const [reportModal, setReportModal] = React.useState<{
+        isOpen: boolean;
+        reportableType:
+            | 'App\\Models\\ForumDiscussion'
+            | 'App\\Models\\ForumReply';
+        reportableId: number;
+        title?: string;
+    }>({
+        isOpen: false,
+        reportableType: 'App\\Models\\ForumDiscussion',
+        reportableId: 0,
+        title: undefined,
+    });
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
         { title: 'Forum Diskusi', href: '/forum' },
         { title: discussion.title, href: `/forum/${discussion.slug}` },
     ];
+
+    const openReportModal = (
+        type: 'App\\Models\\ForumDiscussion' | 'App\\Models\\ForumReply',
+        id: number,
+        title?: string,
+    ) => {
+        setReportModal({
+            isOpen: true,
+            reportableType: type,
+            reportableId: id,
+            title,
+        });
+    };
+
+    const closeReportModal = () => {
+        setReportModal({
+            isOpen: false,
+            reportableType: 'App\\Models\\ForumDiscussion',
+            reportableId: 0,
+            title: undefined,
+        });
+    };
 
     const handleLikeDiscussion = () => {
         router.post(
@@ -142,7 +182,6 @@ export default function ShowDiscussion({
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-                setReplyingTo(null);
             },
         });
     };
@@ -250,62 +289,76 @@ export default function ShowDiscussion({
                             </div>
 
                             {/* Action Menu */}
-                            {(canEdit || canDelete || isAdmin) && (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        {canEdit && (
-                                            <DropdownMenuItem asChild>
-                                                <Link
-                                                    href={`/forum/${discussion.slug}/edit`}
-                                                >
-                                                    <Edit2 className="mr-2 h-4 w-4" />
-                                                    Edit Diskusi
-                                                </Link>
-                                            </DropdownMenuItem>
-                                        )}
-                                        {isAdmin && (
-                                            <>
-                                                {canEdit && (
-                                                    <DropdownMenuSeparator />
-                                                )}
-                                                <DropdownMenuItem
-                                                    onClick={handleTogglePin}
-                                                >
-                                                    <Pin className="mr-2 h-4 w-4" />
-                                                    {discussion.is_pinned
-                                                        ? 'Lepas Pin'
-                                                        : 'Pin'}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={handleToggleLock}
-                                                >
-                                                    <Lock className="mr-2 h-4 w-4" />
-                                                    {discussion.is_locked
-                                                        ? 'Buka Kunci'
-                                                        : 'Kunci'}
-                                                </DropdownMenuItem>
-                                            </>
-                                        )}
-                                        {canDelete && (
-                                            <>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                        <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    {canEdit && (
+                                        <DropdownMenuItem asChild>
+                                            <Link
+                                                href={`/forum/${discussion.slug}/edit`}
+                                            >
+                                                <Edit2 className="mr-2 h-4 w-4" />
+                                                Edit Diskusi
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                    {isAdmin && (
+                                        <>
+                                            {canEdit && (
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onClick={handleDelete}
-                                                    className="text-red-600"
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Hapus Diskusi
-                                                </DropdownMenuItem>
-                                            </>
-                                        )}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            )}
+                                            )}
+                                            <DropdownMenuItem
+                                                onClick={handleTogglePin}
+                                            >
+                                                <Pin className="mr-2 h-4 w-4" />
+                                                {discussion.is_pinned
+                                                    ? 'Lepas Pin'
+                                                    : 'Pin'}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={handleToggleLock}
+                                            >
+                                                <Lock className="mr-2 h-4 w-4" />
+                                                {discussion.is_locked
+                                                    ? 'Buka Kunci'
+                                                    : 'Kunci'}
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+                                    {canDelete && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={handleDelete}
+                                                className="text-red-600"
+                                            >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Hapus Diskusi
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+
+                                    {/* Report Button */}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            openReportModal(
+                                                'App\\Models\\ForumDiscussion',
+                                                discussion.id,
+                                                discussion.title,
+                                            )
+                                        }
+                                        className="text-amber-600"
+                                    >
+                                        <Flag className="mr-2 h-4 w-4" />
+                                        Laporkan Diskusi
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </CardHeader>
 
@@ -492,6 +545,22 @@ export default function ShowDiscussion({
                                                         />
                                                         {reply.likes_count}
                                                     </Button>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            openReportModal(
+                                                                'App\\Models\\ForumReply',
+                                                                reply.id,
+                                                                `Balasan dari ${reply.user.name}`,
+                                                            )
+                                                        }
+                                                        className="text-amber-600 hover:text-amber-700"
+                                                    >
+                                                        <Flag className="mr-1 h-4 w-4" />
+                                                        Laporkan
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </div>
@@ -508,10 +577,16 @@ export default function ShowDiscussion({
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Report Modal */}
+                <ReportModal
+                    isOpen={reportModal.isOpen}
+                    onClose={closeReportModal}
+                    reportableType={reportModal.reportableType}
+                    reportableId={reportModal.reportableId}
+                    reportedItemTitle={reportModal.title}
+                />
             </div>
         </AppLayout>
     );
-}
-function setReplyingTo(arg0: null) {
-    throw new Error('Function not implemented.');
 }

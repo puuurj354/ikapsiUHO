@@ -7,6 +7,7 @@ use App\Http\Controllers\AlumniDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ForumController;
+use App\Http\Controllers\ForumReportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -50,6 +51,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Reply actions
         Route::post('reply/{reply}/like', [ForumController::class, 'toggleReplyLike'])->name('reply.like');
     });
+
+    // Report routes - authenticated users can report content
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::post('/', [ForumReportController::class, 'store'])->name('store');
+    });
 });
 
 // Admin routes - protected by admin middleware
@@ -72,6 +78,13 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::delete('{event}', [AdminEventController::class, 'destroy'])->name('destroy');
         Route::get('{event}/registrations', [AdminEventController::class, 'registrations'])->name('registrations');
         Route::patch('{event}/registrations/{user}', [AdminEventController::class, 'updateRegistrationStatus'])->name('registrations.update');
+    });
+
+    // Forum Report Management
+    Route::prefix('forum/reports')->name('forum.reports.')->group(function () {
+        Route::get('/', [ForumReportController::class, 'index'])->name('index');
+        Route::patch('{report}', [ForumReportController::class, 'update'])->name('update');
+        Route::delete('{report}', [ForumReportController::class, 'deleteReported'])->name('delete-content');
     });
 });
 
