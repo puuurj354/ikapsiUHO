@@ -11,18 +11,17 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    BookOpen,
+    Calendar,
+    Folder,
+    LayoutGrid,
+    MessageSquare,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
 
 const footerNavItems: NavItem[] = [
     {
@@ -38,6 +37,55 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+    const isAdmin = auth.user?.role === 'admin';
+
+    const mainNavItems: NavItem[] = isAdmin
+        ? [
+              {
+                  title: 'Dashboard',
+                  href: '/admin/dashboard',
+                  icon: LayoutGrid,
+              },
+              {
+                  title: 'Manajemen Pengguna',
+                  href: '/admin/users',
+                  icon: Users,
+              },
+              {
+                  title: 'Manajemen Event',
+                  href: '/admin/events',
+                  icon: Calendar,
+              },
+              {
+                  title: 'Forum Diskusi',
+                  href: '/forum',
+                  icon: MessageSquare,
+              },
+          ]
+        : [
+              {
+                  title: 'Dashboard',
+                  href: dashboard(),
+                  icon: LayoutGrid,
+              },
+              {
+                  title: 'Direktori Alumni',
+                  href: '/alumni/directory',
+                  icon: Users,
+              },
+              {
+                  title: 'Event',
+                  href: '/events',
+                  icon: Calendar,
+              },
+              {
+                  title: 'Forum Diskusi',
+                  href: '/forum',
+                  icon: MessageSquare,
+              },
+          ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

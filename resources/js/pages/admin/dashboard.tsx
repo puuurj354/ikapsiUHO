@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     CalendarDays,
     GraduationCap,
@@ -192,16 +192,22 @@ export default function AdminDashboard({ statistics }: AdminDashboardProps) {
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <button className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent">
+                            <Link
+                                href="/admin/users"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                            >
                                 <Icon
                                     iconNode={Users}
                                     className="h-5 w-5 text-primary"
                                 />
                                 <span className="font-medium">
-                                    Kelola Alumni
+                                    Kelola Pengguna
                                 </span>
-                            </button>
-                            <button className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent">
+                            </Link>
+                            <Link
+                                href="/admin/events"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                            >
                                 <Icon
                                     iconNode={CalendarDays}
                                     className="h-5 w-5 text-primary"
@@ -209,14 +215,17 @@ export default function AdminDashboard({ statistics }: AdminDashboardProps) {
                                 <span className="font-medium">
                                     Kelola Event
                                 </span>
-                            </button>
-                            <button className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent">
+                            </Link>
+                            <Link
+                                href="/settings/profile"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                            >
                                 <Icon
                                     iconNode={UserCog}
                                     className="h-5 w-5 text-primary"
                                 />
                                 <span className="font-medium">Pengaturan</span>
-                            </button>
+                            </Link>
                         </div>
                     </CardContent>
                 </Card>
