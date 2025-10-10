@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ForumReportController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -55,6 +56,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Report routes - authenticated users can report content
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::post('/', [ForumReportController::class, 'store'])->name('store');
+    });
+
+    // Notification routes
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/unread', [NotificationController::class, 'getUnread'])->name('unread');
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
 });
 

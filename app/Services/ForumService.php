@@ -6,6 +6,8 @@ use App\Models\ForumCategory;
 use App\Models\ForumDiscussion;
 use App\Models\ForumLike;
 use App\Models\ForumReply;
+use App\Notifications\ForumLikeNotification;
+use App\Notifications\ForumReplyNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -216,6 +218,13 @@ class ForumService
         // Update discussion
         $discussion->updateRepliesCount();
 
+        // Send notification to discussion owner (if not replying to own discussion)
+        if ($discussion->user_id !== Auth::id()) {
+            $discussion->user->notify(
+                new ForumReplyNotification($reply, $discussion, Auth::user())
+            );
+        }
+
         return $reply;
     }
 
@@ -224,7 +233,8 @@ class ForumService
      */
     public function toggleDiscussionLike(ForumDiscussion $discussion): void
     {
-        $existingLike = ForumLike::where('user_id', Auth::id())
+        $currentUser = Auth::user();
+        $existingLike = ForumLike::where('user_id', $currentUser->id)
             ->where('likeable_type', ForumDiscussion::class)
             ->where('likeable_id', $discussion->id)
             ->first();
@@ -233,10 +243,23 @@ class ForumService
             $existingLike->delete();
         } else {
             ForumLike::create([
-                'user_id' => Auth::id(),
+                'user_id' => $currentUser->id,
                 'likeable_type' => ForumDiscussion::class,
                 'likeable_id' => $discussion->id,
             ]);
+
+            // Send notification to discussion owner (if not liking own discussion)
+            if ($discussion->user_id !== $currentUser->id) {
+                $discussion->user->notify(
+                    new ForumLikeNotification(
+                        $currentUser,
+                        ForumDiscussion::class,
+                        $discussion->id,
+                        "diskusi Anda \"{$discussion->title}\"",
+                        "/forum/{$discussion->slug}"
+                    )
+                );
+            }
         }
 
         $discussion->updateLikesCount();
@@ -247,7 +270,8 @@ class ForumService
      */
     public function toggleReplyLike(ForumReply $reply): void
     {
-        $existingLike = ForumLike::where('user_id', Auth::id())
+        $currentUser = Auth::user();
+        $existingLike = ForumLike::where('user_id', $currentUser->id)
             ->where('likeable_type', ForumReply::class)
             ->where('likeable_id', $reply->id)
             ->first();
@@ -256,10 +280,23 @@ class ForumService
             $existingLike->delete();
         } else {
             ForumLike::create([
-                'user_id' => Auth::id(),
+                'user_id' => $currentUser->id,
                 'likeable_type' => ForumReply::class,
                 'likeable_id' => $reply->id,
             ]);
+
+            // Send notification to reply owner (if not liking own reply)
+            if ($reply->user_id !== $currentUser->id) {
+                $reply->user->notify(
+                    new ForumLikeNotification(
+                        $currentUser,
+                        ForumReply::class,
+                        $reply->id,
+                        "balasan Anda",
+                        "/forum/{$reply->discussion->slug}"
+                    )
+                );
+            }
         }
 
         $reply->updateLikesCount();
