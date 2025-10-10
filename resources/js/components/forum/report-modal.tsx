@@ -1,4 +1,3 @@
-import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -13,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import reports from '@/routes/reports';
 import { useForm } from '@inertiajs/react';
+import { AlertTriangle, Check, Flag, Loader2 } from 'lucide-react';
 import React from 'react';
 
 interface ReportModalProps {
@@ -104,10 +104,7 @@ export function ReportModal({
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <Icon
-                            name="flag"
-                            className="h-5 w-5 text-destructive"
-                        />
+                        <Flag className="h-5 w-5 text-destructive" />
                         Laporkan Konten
                     </DialogTitle>
                     <DialogDescription>
@@ -190,10 +187,7 @@ export function ReportModal({
 
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
                         <div className="flex gap-3">
-                            <Icon
-                                name="alert-triangle"
-                                className="h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-500"
-                            />
+                            <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-500" />
                             <div className="space-y-1 text-sm">
                                 <p className="font-medium text-amber-900 dark:text-amber-100">
                                     Laporan akan ditinjau oleh admin
@@ -222,18 +216,12 @@ export function ReportModal({
                         >
                             {processing ? (
                                 <>
-                                    <Icon
-                                        name="loader-2"
-                                        className="mr-2 h-4 w-4 animate-spin"
-                                    />
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Mengirim...
                                 </>
                             ) : (
                                 <>
-                                    <Icon
-                                        name="flag"
-                                        className="mr-2 h-4 w-4"
-                                    />
+                                    <Flag className="mr-2 h-4 w-4" />
                                     Kirim Laporan
                                 </>
                             )}
@@ -245,10 +233,7 @@ export function ReportModal({
                     <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm">
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-6 shadow-lg">
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                                <Icon
-                                    name="check"
-                                    className="h-6 w-6 text-green-600 dark:text-green-500"
-                                />
+                                <Check className="h-6 w-6 text-green-600 dark:text-green-500" />
                             </div>
                             <div>
                                 <p className="font-semibold">

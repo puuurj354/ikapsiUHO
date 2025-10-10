@@ -11,6 +11,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import {
     CalendarDays,
+    Flag,
     GraduationCap,
     TrendingUp,
     UserCog,
@@ -191,7 +192,7 @@ export default function AdminDashboard({ statistics }: AdminDashboardProps) {
                         <CardDescription>Menu manajemen admin</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <Link
                                 href="/admin/users"
                                 className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
@@ -214,6 +215,18 @@ export default function AdminDashboard({ statistics }: AdminDashboardProps) {
                                 />
                                 <span className="font-medium">
                                     Kelola Event
+                                </span>
+                            </Link>
+                            <Link
+                                href="/admin/forum/reports"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                            >
+                                <Icon
+                                    iconNode={Flag}
+                                    className="h-5 w-5 text-primary"
+                                />
+                                <span className="font-medium">
+                                    Laporan Forum
                                 </span>
                             </Link>
                             <Link

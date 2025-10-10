@@ -13,8 +13,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     Edit2,
@@ -51,6 +51,7 @@ interface Reply {
     created_at: string;
     likes_count: number;
     user_liked: boolean;
+    parent_id: number | null;
     user: User;
 }
 
@@ -86,6 +87,9 @@ export default function ShowDiscussion({
     canDelete,
     isAdmin,
 }: Props) {
+    const { auth } = usePage<SharedData>().props;
+    const currentUserId = auth.user.id;
+
     const { data, setData, post, processing, errors, reset } = useForm({
         content: '',
         parent_id: null as number | null,
@@ -106,9 +110,15 @@ export default function ShowDiscussion({
         title: undefined,
     });
 
+    // Reply Target State (untuk nested replies)
+    const [replyingTo, setReplyingTo] = React.useState<{
+        id: number;
+        userName: string;
+    } | null>(null);
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Forum Diskusi', href: '/forum' },
+        { title: 'Forum Diskusi', href: '/forum/${discussion.slug}' },
         { title: discussion.title, href: `/forum/${discussion.slug}` },
     ];
 
@@ -182,8 +192,23 @@ export default function ShowDiscussion({
             preserveScroll: true,
             onSuccess: () => {
                 reset();
+                setReplyingTo(null); // Clear reply target after successful submit
             },
         });
+    };
+
+    const handleReplyToUser = (replyId: number, userName: string) => {
+        setReplyingTo({ id: replyId, userName });
+        setData('parent_id', replyId);
+        // Scroll to reply form
+        document
+            .getElementById('reply-form')
+            ?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const cancelReply = () => {
+        setReplyingTo(null);
+        setData('parent_id', null);
     };
 
     const formatDate = (dateString: string) => {
@@ -342,21 +367,25 @@ export default function ShowDiscussion({
                                         </>
                                     )}
 
-                                    {/* Report Button */}
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            openReportModal(
-                                                'App\\Models\\ForumDiscussion',
-                                                discussion.id,
-                                                discussion.title,
-                                            )
-                                        }
-                                        className="text-amber-600"
-                                    >
-                                        <Flag className="mr-2 h-4 w-4" />
-                                        Laporkan Diskusi
-                                    </DropdownMenuItem>
+                                    {/* Report Button - Only show if not own content */}
+                                    {currentUserId !== discussion.user.id && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    openReportModal(
+                                                        'App\\Models\\ForumDiscussion',
+                                                        discussion.id,
+                                                        discussion.title,
+                                                    )
+                                                }
+                                                className="text-amber-600"
+                                            >
+                                                <Flag className="mr-2 h-4 w-4" />
+                                                Laporkan Diskusi
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -425,11 +454,43 @@ export default function ShowDiscussion({
                         {/* Reply Form */}
                         {!discussion.is_locked ? (
                             <form
+                                id="reply-form"
                                 onSubmit={handleSubmitReply}
                                 className="space-y-4"
                             >
+                                {/* Reply Target Indicator */}
+                                {replyingTo && (
+                                    <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900/50 dark:bg-blue-950/30">
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                            <span className="text-blue-900 dark:text-blue-100">
+                                                Membalas{' '}
+                                                <span className="font-semibold">
+                                                    {replyingTo.userName}
+                                                </span>
+                                            </span>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={cancelReply}
+                                            className="h-auto p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                                        >
+                                            <Icon
+                                                iconNode={Trash2}
+                                                className="h-4 w-4"
+                                            />
+                                        </Button>
+                                    </div>
+                                )}
+
                                 <Textarea
-                                    placeholder="Tulis balasan Anda..."
+                                    placeholder={
+                                        replyingTo
+                                            ? `Balas ${replyingTo.userName}...`
+                                            : 'Tulis balasan Anda...'
+                                    }
                                     value={data.content}
                                     onChange={(e) =>
                                         setData('content', e.target.value)
@@ -481,7 +542,11 @@ export default function ShowDiscussion({
                                 {replies.map((reply) => (
                                     <div
                                         key={reply.id}
-                                        className="rounded-lg border bg-gray-50 p-4"
+                                        className={`rounded-lg border bg-gray-50 p-4 ${
+                                            reply.parent_id
+                                                ? 'ml-12 border-l-4 border-l-blue-400'
+                                                : ''
+                                        }`}
                                     >
                                         <div className="flex items-start gap-3">
                                             <Avatar className="h-10 w-10">
@@ -522,6 +587,18 @@ export default function ShowDiscussion({
                                                         </span>
                                                     </div>
                                                 </div>
+
+                                                {/* Parent Reply Indicator */}
+                                                {reply.parent_id && (
+                                                    <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                                                        <MessageSquare className="h-3 w-3" />
+                                                        <span>
+                                                            Membalas balasan
+                                                            lain
+                                                        </span>
+                                                    </div>
+                                                )}
+
                                                 <p className="text-gray-700">
                                                     {reply.content}
                                                 </p>
@@ -546,21 +623,44 @@ export default function ShowDiscussion({
                                                         {reply.likes_count}
                                                     </Button>
 
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            openReportModal(
-                                                                'App\\Models\\ForumReply',
-                                                                reply.id,
-                                                                `Balasan dari ${reply.user.name}`,
-                                                            )
-                                                        }
-                                                        className="text-amber-600 hover:text-amber-700"
-                                                    >
-                                                        <Flag className="mr-1 h-4 w-4" />
-                                                        Laporkan
-                                                    </Button>
+                                                    {/* Reply Button - tidak bisa reply jika discussion locked */}
+                                                    {!discussion.is_locked && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                handleReplyToUser(
+                                                                    reply.id,
+                                                                    reply.user
+                                                                        .name,
+                                                                )
+                                                            }
+                                                            className="text-blue-600 hover:text-blue-700"
+                                                        >
+                                                            <MessageSquare className="mr-1 h-4 w-4" />
+                                                            Balas
+                                                        </Button>
+                                                    )}
+
+                                                    {/* Report Button - Only show if not own reply */}
+                                                    {currentUserId !==
+                                                        reply.user.id && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                openReportModal(
+                                                                    'App\\Models\\ForumReply',
+                                                                    reply.id,
+                                                                    `Balasan dari ${reply.user.name}`,
+                                                                )
+                                                            }
+                                                            className="text-amber-600 hover:text-amber-700"
+                                                        >
+                                                            <Flag className="mr-1 h-4 w-4" />
+                                                            Laporkan
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

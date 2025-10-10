@@ -101,13 +101,13 @@ class ForumService
             ->where('slug', $slug)
             ->firstOrFail();
 
-        // Increment views
-        $discussion->incrementViews();
+        // Track unique view per user
+        $this->trackView($discussion);
 
-        // Get replies with user relationship
+        // Get all replies (including nested ones) with user relationship
         $replies = ForumReply::with(['user'])
             ->where('forum_discussion_id', $discussion->id)
-            ->whereNull('parent_id')
+            ->orderBy('parent_id', 'asc') // Parent replies first
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -134,6 +134,29 @@ class ForumService
             'canDelete' => $discussion->user_id === $user->id || $user->isAdmin(),
             'isAdmin' => $user->isAdmin(),
         ];
+    }
+
+    /**
+     * Track view for a discussion (one view per user).
+     */
+    private function trackView(ForumDiscussion $discussion): void
+    {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            return;
+        }
+
+        // Use firstOrCreate to ensure only one view per user per discussion
+        \App\Models\ForumView::firstOrCreate([
+            'user_id' => $userId,
+            'discussion_id' => $discussion->id,
+        ]);
+
+        // Update views_count on discussion
+        $discussion->update([
+            'views_count' => \App\Models\ForumView::where('discussion_id', $discussion->id)->count()
+        ]);
     }
 
     /**
