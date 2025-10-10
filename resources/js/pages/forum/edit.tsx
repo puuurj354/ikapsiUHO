@@ -66,11 +66,22 @@ export default function EditDiscussion({ discussion, categories }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.patch(`/forum/${discussion.slug}`, data, {
-            onSuccess: () => {
-                // Redirect akan ditangani oleh controller
+        router.patch(
+            `/forum/${discussion.slug}`,
+            { ...data },
+            {
+                onSuccess: () => {
+                    // Redirect akan ditangani oleh controller
+                    // setelah berhasil mengupdate diskusi
+                },
+                preserveScroll: true,
+                preserveState: true,
+                onError: (errors) => {
+                    // Handle errors jika ada
+                    console.error('Update failed:', errors);
+                },
             },
-        });
+        );
     };
 
     return (
