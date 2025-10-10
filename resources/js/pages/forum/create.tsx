@@ -61,14 +61,14 @@ export default function CreateDiscussion({ categories }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Buat Diskusi Baru - Forum" />
 
-            <div className="mx-auto max-w-4xl space-y-6">
+            <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 md:px-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                             Buat Diskusi Baru
                         </h1>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                             Mulai diskusi baru dengan alumni lainnya
                         </p>
                     </div>

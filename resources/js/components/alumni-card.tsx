@@ -1,7 +1,8 @@
 import { Icon } from '@/components/icon';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Briefcase, GraduationCap, Mail, User } from 'lucide-react';
+import { Briefcase, GraduationCap, Mail } from 'lucide-react';
 
 interface AlumniCardProps {
     id: number;
@@ -10,6 +11,7 @@ interface AlumniCardProps {
     angkatan: string | null;
     profesi: string | null;
     bio: string | null;
+    profile_picture_url?: string;
 }
 
 export function AlumniCard({
@@ -18,6 +20,7 @@ export function AlumniCard({
     angkatan,
     profesi,
     bio,
+    profile_picture_url,
 }: AlumniCardProps) {
     return (
         <Card className="transition-shadow duration-200 hover:shadow-lg">
@@ -25,12 +28,17 @@ export function AlumniCard({
                 <div className="flex items-start space-x-4">
                     {/* Avatar */}
                     <div className="flex-shrink-0">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
-                            <Icon
-                                iconNode={User}
-                                className="h-8 w-8 text-primary"
-                            />
-                        </div>
+                        <Avatar className="h-16 w-16">
+                            <AvatarImage src={profile_picture_url} alt={name} />
+                            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-lg font-semibold text-primary">
+                                {name
+                                    .split(' ')
+                                    .map((n) => n[0])
+                                    .join('')
+                                    .toUpperCase()
+                                    .slice(0, 2)}
+                            </AvatarFallback>
+                        </Avatar>
                     </div>
 
                     {/* Content */}

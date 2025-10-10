@@ -24,6 +24,7 @@ interface AlumniData {
     angkatan: string | null;
     profesi: string | null;
     bio: string | null;
+    profile_picture_url?: string;
     created_at: string;
 }
 
