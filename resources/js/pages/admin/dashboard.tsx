@@ -83,35 +83,35 @@ export default function AdminDashboard({ statistics }: AdminDashboardProps) {
             <div className="container mx-auto space-y-8 py-8">
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">
+                    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                         Dashboard Admin
                     </h1>
-                    <p className="mt-2 text-muted-foreground">
+                    <p className="mt-2 text-sm text-muted-foreground sm:text-base">
                         Selamat datang di panel administrasi IKAPSI UHO
                     </p>
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
                     {statCards.map((stat, index) => (
                         <Card key={index} className="overflow-hidden">
-                            <CardHeader className="pb-3">
+                            <CardHeader className="pb-2 sm:pb-3">
                                 <div className="flex items-center justify-between">
-                                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                                    <CardTitle className="text-xs font-medium text-muted-foreground sm:text-sm">
                                         {stat.title}
                                     </CardTitle>
                                     <div
-                                        className={`rounded-lg p-2 ${stat.bgColor}`}
+                                        className={`rounded-lg p-1.5 sm:p-2 ${stat.bgColor}`}
                                     >
                                         <Icon
                                             iconNode={stat.icon}
-                                            className={`h-5 w-5 ${stat.color}`}
+                                            className={`h-4 w-4 sm:h-5 sm:w-5 ${stat.color}`}
                                         />
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">
+                                <div className="text-2xl font-bold sm:text-3xl">
                                     {stat.value}
                                 </div>
                                 <p className="mt-1 text-xs text-muted-foreground">
@@ -188,56 +188,62 @@ export default function AdminDashboard({ statistics }: AdminDashboardProps) {
                 {/* Quick Actions */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Aksi Cepat</CardTitle>
-                        <CardDescription>Menu manajemen admin</CardDescription>
+                        <CardTitle className="text-base sm:text-lg">
+                            Aksi Cepat
+                        </CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
+                            Menu manajemen admin
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
                             <Link
                                 href="/admin/users"
-                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                                className="flex items-center space-x-2 rounded-lg border p-3 transition-colors hover:bg-accent sm:space-x-3 sm:p-4"
                             >
                                 <Icon
                                     iconNode={Users}
-                                    className="h-5 w-5 text-primary"
+                                    className="h-4 w-4 flex-shrink-0 text-primary sm:h-5 sm:w-5"
                                 />
-                                <span className="font-medium">
+                                <span className="text-sm font-medium sm:text-base">
                                     Kelola Pengguna
                                 </span>
                             </Link>
                             <Link
                                 href="/admin/events"
-                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                                className="flex items-center space-x-2 rounded-lg border p-3 transition-colors hover:bg-accent sm:space-x-3 sm:p-4"
                             >
                                 <Icon
                                     iconNode={CalendarDays}
-                                    className="h-5 w-5 text-primary"
+                                    className="h-4 w-4 flex-shrink-0 text-primary sm:h-5 sm:w-5"
                                 />
-                                <span className="font-medium">
+                                <span className="text-sm font-medium sm:text-base">
                                     Kelola Event
                                 </span>
                             </Link>
                             <Link
                                 href="/admin/forum/reports"
-                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                                className="flex items-center space-x-2 rounded-lg border p-3 transition-colors hover:bg-accent sm:space-x-3 sm:p-4"
                             >
                                 <Icon
                                     iconNode={Flag}
-                                    className="h-5 w-5 text-primary"
+                                    className="h-4 w-4 flex-shrink-0 text-primary sm:h-5 sm:w-5"
                                 />
-                                <span className="font-medium">
+                                <span className="text-sm font-medium sm:text-base">
                                     Laporan Forum
                                 </span>
                             </Link>
                             <Link
                                 href="/settings/profile"
-                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                                className="flex items-center space-x-2 rounded-lg border p-3 transition-colors hover:bg-accent sm:space-x-3 sm:p-4"
                             >
                                 <Icon
                                     iconNode={UserCog}
-                                    className="h-5 w-5 text-primary"
+                                    className="h-4 w-4 flex-shrink-0 text-primary sm:h-5 sm:w-5"
                                 />
-                                <span className="font-medium">Pengaturan</span>
+                                <span className="text-sm font-medium sm:text-base">
+                                    Pengaturan
+                                </span>
                             </Link>
                         </div>
                     </CardContent>

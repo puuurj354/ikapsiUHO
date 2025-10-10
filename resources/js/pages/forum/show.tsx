@@ -17,6 +17,8 @@ import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
+    ChevronDown,
+    ChevronRight,
     Edit2,
     Eye,
     Flag,
@@ -115,6 +117,32 @@ export default function ShowDiscussion({
         id: number;
         userName: string;
     } | null>(null);
+
+    // Collapse state untuk nested replies
+    const [collapsedReplies, setCollapsedReplies] = React.useState<Set<number>>(
+        new Set(),
+    );
+
+    // Organize replies into parent-children structure
+    const organizedReplies = React.useMemo(() => {
+        const parentReplies = replies.filter((r) => !r.parent_id);
+        return parentReplies.map((parent) => ({
+            parent,
+            children: replies.filter((r) => r.parent_id === parent.id),
+        }));
+    }, [replies]);
+
+    const toggleCollapseReplies = (replyId: number) => {
+        setCollapsedReplies((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(replyId)) {
+                newSet.delete(replyId);
+            } else {
+                newSet.add(replyId);
+            }
+            return newSet;
+        });
+    };
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
@@ -276,14 +304,14 @@ export default function ShowDiscussion({
                         </div>
 
                         {/* Title */}
-                        <h1 className="text-3xl font-bold text-gray-900">
+                        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
                             {discussion.title}
                         </h1>
 
                         {/* Meta Info */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <Avatar className="h-10 w-10">
+                        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
+                            <div className="flex items-center gap-3 sm:gap-4">
+                                <Avatar className="h-10 w-10 flex-shrink-0">
                                     <AvatarImage
                                         src={
                                             discussion.user.profile_picture_url
@@ -293,21 +321,21 @@ export default function ShowDiscussion({
                                         {getInitials(discussion.user.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <p className="font-medium text-gray-900">
+                                <div className="min-w-0">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <p className="truncate font-medium text-gray-900">
                                             {discussion.user.name}
                                         </p>
                                         {discussion.user.role === 'admin' && (
                                             <Badge
                                                 variant="secondary"
-                                                className="bg-purple-100 text-purple-700"
+                                                className="flex-shrink-0 bg-purple-100 text-purple-700"
                                             >
                                                 Admin
                                             </Badge>
                                         )}
                                     </div>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-xs text-gray-500 sm:text-sm">
                                         {formatDate(discussion.created_at)}
                                     </p>
                                 </div>
@@ -316,7 +344,11 @@ export default function ShowDiscussion({
                             {/* Action Menu */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="flex-shrink-0"
+                                    >
                                         <MoreVertical className="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -391,9 +423,9 @@ export default function ShowDiscussion({
                         </div>
                     </CardHeader>
 
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-4 sm:space-y-6">
                         {/* Content */}
-                        <div className="prose max-w-none text-gray-700">
+                        <div className="prose prose-sm sm:prose max-w-none text-gray-700">
                             {discussion.content
                                 .split('\n')
                                 .map((paragraph, index) => (
@@ -402,20 +434,20 @@ export default function ShowDiscussion({
                         </div>
 
                         {/* Stats & Actions */}
-                        <div className="flex items-center justify-between border-t pt-4">
-                            <div className="flex items-center gap-6 text-sm text-gray-500">
+                        <div className="flex flex-col items-start justify-between gap-3 border-t pt-4 sm:flex-row sm:items-center sm:gap-0">
+                            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 sm:gap-6 sm:text-sm">
                                 <div className="flex items-center gap-1">
-                                    <Eye className="h-4 w-4" />
+                                    <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                                     <span>{discussion.views_count} views</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <MessageSquare className="h-4 w-4" />
+                                    <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
                                     <span>
                                         {discussion.replies_count} balasan
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <Heart className="h-4 w-4" />
+                                    <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
                                     <span>{discussion.likes_count} likes</span>
                                 </div>
                             </div>
@@ -461,9 +493,9 @@ export default function ShowDiscussion({
                                 {/* Reply Target Indicator */}
                                 {replyingTo && (
                                     <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900/50 dark:bg-blue-950/30">
-                                        <div className="flex items-center gap-2 text-sm">
-                                            <MessageSquare className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                            <span className="text-blue-900 dark:text-blue-100">
+                                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                                            <MessageSquare className="h-3 w-3 flex-shrink-0 text-blue-600 sm:h-4 sm:w-4 dark:text-blue-400" />
+                                            <span className="truncate text-blue-900 dark:text-blue-100">
                                                 Membalas{' '}
                                                 <span className="font-semibold">
                                                     {replyingTo.userName}
@@ -475,11 +507,11 @@ export default function ShowDiscussion({
                                             variant="ghost"
                                             size="sm"
                                             onClick={cancelReply}
-                                            className="h-auto p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                                            className="h-auto flex-shrink-0 p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400"
                                         >
                                             <Icon
                                                 iconNode={Trash2}
-                                                className="h-4 w-4"
+                                                className="h-3 w-3 sm:h-4 sm:w-4"
                                             />
                                         </Button>
                                     </div>
@@ -497,30 +529,44 @@ export default function ShowDiscussion({
                                     }
                                     className={
                                         errors.content
-                                            ? 'min-h-[120px] border-red-500'
-                                            : 'min-h-[120px]'
+                                            ? 'min-h-[100px] border-red-500 sm:min-h-[120px]'
+                                            : 'min-h-[100px] sm:min-h-[120px]'
                                     }
                                 />
                                 {errors.content && (
-                                    <div className="flex items-center gap-1 text-sm text-red-500">
-                                        <AlertCircle className="h-4 w-4" />
+                                    <div className="flex items-center gap-1 text-xs text-red-500 sm:text-sm">
+                                        <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                                         <span>{errors.content}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-end">
-                                    <Button type="submit" disabled={processing}>
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="w-full sm:w-auto"
+                                    >
                                         {processing ? (
                                             <>
                                                 <Icon
                                                     iconNode={Loader2}
                                                     className="mr-2 h-4 w-4 animate-spin"
                                                 />
-                                                Mengirim...
+                                                <span className="hidden sm:inline">
+                                                    Mengirim...
+                                                </span>
+                                                <span className="sm:hidden">
+                                                    Kirim...
+                                                </span>
                                             </>
                                         ) : (
                                             <>
                                                 <Send className="mr-2 h-4 w-4" />
-                                                Kirim Balasan
+                                                <span className="hidden sm:inline">
+                                                    Kirim Balasan
+                                                </span>
+                                                <span className="sm:hidden">
+                                                    Kirim
+                                                </span>
                                             </>
                                         )}
                                     </Button>
@@ -539,133 +585,284 @@ export default function ShowDiscussion({
                         {/* Replies List */}
                         {replies.length > 0 ? (
                             <div className="space-y-4">
-                                {replies.map((reply) => (
-                                    <div
-                                        key={reply.id}
-                                        className={`rounded-lg border bg-gray-50 p-4 ${
-                                            reply.parent_id
-                                                ? 'ml-12 border-l-4 border-l-blue-400'
-                                                : ''
-                                        }`}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <Avatar className="h-10 w-10">
-                                                <AvatarImage
-                                                    src={
-                                                        reply.user
-                                                            .profile_picture_url
-                                                    }
-                                                />
-                                                <AvatarFallback>
-                                                    {getInitials(
-                                                        reply.user.name,
-                                                    )}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1 space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-2">
-                                                        <p className="font-medium text-gray-900">
-                                                            {reply.user.name}
-                                                        </p>
-                                                        {reply.user.role ===
-                                                            'admin' && (
-                                                            <Badge
-                                                                variant="secondary"
-                                                                className="bg-purple-100 text-purple-700"
-                                                            >
-                                                                Admin
-                                                            </Badge>
-                                                        )}
-                                                        <span className="text-sm text-gray-500">
-                                                            •
-                                                        </span>
-                                                        <span className="text-sm text-gray-500">
-                                                            {formatDate(
-                                                                reply.created_at,
+                                {organizedReplies.map(
+                                    ({ parent, children }) => (
+                                        <div
+                                            key={parent.id}
+                                            className="space-y-3"
+                                        >
+                                            {/* Parent Reply */}
+                                            <div className="rounded-lg border bg-gray-50 p-4">
+                                                <div className="flex items-start gap-3">
+                                                    <Avatar className="h-10 w-10 flex-shrink-0">
+                                                        <AvatarImage
+                                                            src={
+                                                                parent.user
+                                                                    .profile_picture_url
+                                                            }
+                                                        />
+                                                        <AvatarFallback>
+                                                            {getInitials(
+                                                                parent.user
+                                                                    .name,
                                                             )}
-                                                        </span>
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="min-w-0 flex-1 space-y-2">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <p className="font-medium text-gray-900">
+                                                                {
+                                                                    parent.user
+                                                                        .name
+                                                                }
+                                                            </p>
+                                                            {parent.user
+                                                                .role ===
+                                                                'admin' && (
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className="bg-purple-100 text-purple-700"
+                                                                >
+                                                                    Admin
+                                                                </Badge>
+                                                            )}
+                                                            <span className="text-sm text-gray-500">
+                                                                •
+                                                            </span>
+                                                            <span className="text-sm text-gray-500">
+                                                                {formatDate(
+                                                                    parent.created_at,
+                                                                )}
+                                                            </span>
+                                                        </div>
+
+                                                        <p className="break-words text-gray-700">
+                                                            {parent.content}
+                                                        </p>
+
+                                                        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    handleLikeReply(
+                                                                        parent.id,
+                                                                    )
+                                                                }
+                                                                className={
+                                                                    parent.user_liked
+                                                                        ? 'text-red-500'
+                                                                        : ''
+                                                                }
+                                                            >
+                                                                <Heart
+                                                                    className={`mr-1 h-4 w-4 ${parent.user_liked ? 'fill-current' : ''}`}
+                                                                />
+                                                                {
+                                                                    parent.likes_count
+                                                                }
+                                                            </Button>
+
+                                                            {!discussion.is_locked && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        handleReplyToUser(
+                                                                            parent.id,
+                                                                            parent
+                                                                                .user
+                                                                                .name,
+                                                                        )
+                                                                    }
+                                                                    className="text-blue-600 hover:text-blue-700"
+                                                                >
+                                                                    <MessageSquare className="mr-1 h-4 w-4" />
+                                                                    Balas
+                                                                </Button>
+                                                            )}
+
+                                                            {currentUserId !==
+                                                                parent.user
+                                                                    .id && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        openReportModal(
+                                                                            'App\\Models\\ForumReply',
+                                                                            parent.id,
+                                                                            `Balasan dari ${parent.user.name}`,
+                                                                        )
+                                                                    }
+                                                                    className="text-amber-600 hover:text-amber-700"
+                                                                >
+                                                                    <Flag className="mr-1 h-4 w-4" />
+                                                                    <span className="hidden sm:inline">
+                                                                        Laporkan
+                                                                    </span>
+                                                                </Button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                {/* Parent Reply Indicator */}
-                                                {reply.parent_id && (
-                                                    <div className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
-                                                        <MessageSquare className="h-3 w-3" />
-                                                        <span>
-                                                            Membalas balasan
-                                                            lain
-                                                        </span>
-                                                    </div>
-                                                )}
-
-                                                <p className="text-gray-700">
-                                                    {reply.content}
-                                                </p>
-                                                <div className="flex items-center gap-4">
+                                            {/* Nested Replies with Collapse */}
+                                            {children.length > 0 && (
+                                                <div className="ml-6 space-y-3 sm:ml-12">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() =>
-                                                            handleLikeReply(
-                                                                reply.id,
+                                                            toggleCollapseReplies(
+                                                                parent.id,
                                                             )
                                                         }
-                                                        className={
-                                                            reply.user_liked
-                                                                ? 'text-red-500'
-                                                                : ''
-                                                        }
+                                                        className="text-sm text-blue-600 hover:text-blue-700"
                                                     >
-                                                        <Heart
-                                                            className={`mr-1 h-4 w-4 ${reply.user_liked ? 'fill-current' : ''}`}
-                                                        />
-                                                        {reply.likes_count}
+                                                        {collapsedReplies.has(
+                                                            parent.id,
+                                                        ) ? (
+                                                            <ChevronRight className="mr-1 h-4 w-4" />
+                                                        ) : (
+                                                            <ChevronDown className="mr-1 h-4 w-4" />
+                                                        )}
+                                                        {collapsedReplies.has(
+                                                            parent.id,
+                                                        )
+                                                            ? `Tampilkan ${children.length} balasan`
+                                                            : `Sembunyikan ${children.length} balasan`}
                                                     </Button>
 
-                                                    {/* Reply Button - tidak bisa reply jika discussion locked */}
-                                                    {!discussion.is_locked && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handleReplyToUser(
-                                                                    reply.id,
-                                                                    reply.user
-                                                                        .name,
-                                                                )
-                                                            }
-                                                            className="text-blue-600 hover:text-blue-700"
-                                                        >
-                                                            <MessageSquare className="mr-1 h-4 w-4" />
-                                                            Balas
-                                                        </Button>
-                                                    )}
+                                                    {!collapsedReplies.has(
+                                                        parent.id,
+                                                    ) &&
+                                                        children.map(
+                                                            (child) => (
+                                                                <div
+                                                                    key={
+                                                                        child.id
+                                                                    }
+                                                                    className="rounded-lg border border-l-4 border-l-blue-400 bg-blue-50/50 p-3 sm:p-4"
+                                                                >
+                                                                    <div className="flex items-start gap-2 sm:gap-3">
+                                                                        <Avatar className="h-8 w-8 flex-shrink-0">
+                                                                            <AvatarImage
+                                                                                src={
+                                                                                    child
+                                                                                        .user
+                                                                                        .profile_picture_url
+                                                                                }
+                                                                            />
+                                                                            <AvatarFallback>
+                                                                                {getInitials(
+                                                                                    child
+                                                                                        .user
+                                                                                        .name,
+                                                                                )}
+                                                                            </AvatarFallback>
+                                                                        </Avatar>
+                                                                        <div className="min-w-0 flex-1 space-y-2">
+                                                                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                                                                                <p className="font-medium text-gray-900">
+                                                                                    {
+                                                                                        child
+                                                                                            .user
+                                                                                            .name
+                                                                                    }
+                                                                                </p>
+                                                                                {child
+                                                                                    .user
+                                                                                    .role ===
+                                                                                    'admin' && (
+                                                                                    <Badge
+                                                                                        variant="secondary"
+                                                                                        className="bg-purple-100 text-xs text-purple-700"
+                                                                                    >
+                                                                                        Admin
+                                                                                    </Badge>
+                                                                                )}
+                                                                                <span className="text-xs text-gray-500">
+                                                                                    •
+                                                                                </span>
+                                                                                <span className="text-xs text-gray-500">
+                                                                                    {formatDate(
+                                                                                        child.created_at,
+                                                                                    )}
+                                                                                </span>
+                                                                            </div>
 
-                                                    {/* Report Button - Only show if not own reply */}
-                                                    {currentUserId !==
-                                                        reply.user.id && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                openReportModal(
-                                                                    'App\\Models\\ForumReply',
-                                                                    reply.id,
-                                                                    `Balasan dari ${reply.user.name}`,
-                                                                )
-                                                            }
-                                                            className="text-amber-600 hover:text-amber-700"
-                                                        >
-                                                            <Flag className="mr-1 h-4 w-4" />
-                                                            Laporkan
-                                                        </Button>
-                                                    )}
+                                                                            <div className="flex items-center gap-1 text-xs text-blue-600">
+                                                                                <MessageSquare className="h-3 w-3" />
+                                                                                <span>
+                                                                                    Membalas{' '}
+                                                                                    {
+                                                                                        parent
+                                                                                            .user
+                                                                                            .name
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+
+                                                                            <p className="text-sm break-words text-gray-700">
+                                                                                {
+                                                                                    child.content
+                                                                                }
+                                                                            </p>
+
+                                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                                <Button
+                                                                                    variant="ghost"
+                                                                                    size="sm"
+                                                                                    onClick={() =>
+                                                                                        handleLikeReply(
+                                                                                            child.id,
+                                                                                        )
+                                                                                    }
+                                                                                    className={`text-xs ${child.user_liked ? 'text-red-500' : ''}`}
+                                                                                >
+                                                                                    <Heart
+                                                                                        className={`mr-1 h-3 w-3 ${child.user_liked ? 'fill-current' : ''}`}
+                                                                                    />
+                                                                                    {
+                                                                                        child.likes_count
+                                                                                    }
+                                                                                </Button>
+
+                                                                                {currentUserId !==
+                                                                                    child
+                                                                                        .user
+                                                                                        .id && (
+                                                                                    <Button
+                                                                                        variant="ghost"
+                                                                                        size="sm"
+                                                                                        onClick={() =>
+                                                                                            openReportModal(
+                                                                                                'App\\Models\\ForumReply',
+                                                                                                child.id,
+                                                                                                `Balasan dari ${child.user.name}`,
+                                                                                            )
+                                                                                        }
+                                                                                        className="text-xs text-amber-600 hover:text-amber-700"
+                                                                                    >
+                                                                                        <Flag className="mr-1 h-3 w-3" />
+                                                                                        <span className="hidden sm:inline">
+                                                                                            Laporkan
+                                                                                        </span>
+                                                                                    </Button>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )}
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
-                                    </div>
-                                ))}
+                                    ),
+                                )}
                             </div>
                         ) : (
                             <div className="py-12 text-center">

@@ -178,16 +178,16 @@ export default function ForumIndex({
 
             <div className="container mx-auto space-y-8 py-8">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                             Forum Diskusi
                         </h1>
-                        <p className="text-muted-foreground">
+                        <p className="text-sm text-muted-foreground sm:text-base">
                             Berbagi dan berdiskusi dengan sesama alumni
                         </p>
                     </div>
-                    <Button asChild>
+                    <Button asChild className="w-full sm:w-auto">
                         <Link href="/forum/create">
                             <Icon iconNode={Plus} className="mr-2 h-4 w-4" />
                             Buat Diskusi
@@ -196,7 +196,8 @@ export default function ForumIndex({
                 </div>
 
                 {/* Categories */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {/* Categories Grid */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
                     {categories.map((category) => (
                         <Card
                             key={category.id}
@@ -205,33 +206,36 @@ export default function ForumIndex({
                                 setSelectedCategory(category.id.toString())
                             }
                         >
-                            <CardHeader className="pb-3">
+                            <CardHeader className="pb-2 sm:pb-3">
                                 <div className="flex items-center justify-between">
                                     <div
-                                        className="flex h-10 w-10 items-center justify-center rounded-lg"
+                                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10"
                                         style={{
                                             backgroundColor: `${category.color}20`,
                                         }}
                                     >
                                         <Icon
                                             iconNode={getIcon(category.icon)}
-                                            className="h-5 w-5"
+                                            className="h-4 w-4 sm:h-5 sm:w-5"
                                             style={{ color: category.color }}
                                         />
                                     </div>
                                     {category.active_discussions_count !==
                                         undefined && (
-                                        <Badge variant="secondary">
+                                        <Badge
+                                            variant="secondary"
+                                            className="text-xs"
+                                        >
                                             {category.active_discussions_count}
                                         </Badge>
                                     )}
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <h3 className="font-semibold">
+                                <h3 className="text-sm font-semibold sm:text-base">
                                     {category.name}
                                 </h3>
-                                <p className="line-clamp-2 text-sm text-muted-foreground">
+                                <p className="line-clamp-2 text-xs text-muted-foreground sm:text-sm">
                                     {category.description}
                                 </p>
                             </CardContent>
@@ -241,8 +245,8 @@ export default function ForumIndex({
 
                 {/* Filters */}
                 <Card>
-                    <CardHeader>
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <CardHeader className="p-4 sm:p-6">
+                        <div className="flex flex-col gap-3 sm:gap-4">
                             <div className="flex-1">
                                 <div className="relative">
                                     <Icon
@@ -255,16 +259,16 @@ export default function ForumIndex({
                                         onChange={(e) =>
                                             setSearch(e.target.value)
                                         }
-                                        className="pl-9"
+                                        className="pl-9 text-sm"
                                     />
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col gap-2 sm:flex-row">
                                 <Select
                                     value={selectedCategory}
                                     onValueChange={setSelectedCategory}
                                 >
-                                    <SelectTrigger className="w-[180px]">
+                                    <SelectTrigger className="w-full text-sm sm:w-[180px]">
                                         <SelectValue placeholder="Kategori" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -285,7 +289,7 @@ export default function ForumIndex({
                                     value={sortBy}
                                     onValueChange={setSortBy}
                                 >
-                                    <SelectTrigger className="w-[150px]">
+                                    <SelectTrigger className="w-full text-sm sm:w-[150px]">
                                         <SelectValue placeholder="Urutkan" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -357,20 +361,20 @@ export default function ForumIndex({
                                                             Di-pin
                                                         </Badge>
                                                     </div>
-                                                    <h3 className="mt-1 font-semibold hover:text-primary">
+                                                    <h3 className="mt-1 line-clamp-2 text-sm font-semibold hover:text-primary sm:text-base">
                                                         {discussion.title}
                                                     </h3>
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="truncate text-xs text-muted-foreground sm:text-sm">
                                                         {discussion.user.name} •{' '}
                                                         {formatDate(
                                                             discussion.last_activity_at,
                                                         )}
                                                     </p>
-                                                    <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                                                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground sm:gap-4 sm:text-sm">
                                                         <span className="flex items-center gap-1">
                                                             <Icon
                                                                 iconNode={Eye}
-                                                                className="h-4 w-4"
+                                                                className="h-3 w-3 sm:h-4 sm:w-4"
                                                             />
                                                             {
                                                                 discussion.views_count
@@ -381,7 +385,7 @@ export default function ForumIndex({
                                                                 iconNode={
                                                                     MessageSquare
                                                                 }
-                                                                className="h-4 w-4"
+                                                                className="h-3 w-3 sm:h-4 sm:w-4"
                                                             />
                                                             {
                                                                 discussion.replies_count
@@ -390,7 +394,7 @@ export default function ForumIndex({
                                                         <span className="flex items-center gap-1">
                                                             <Icon
                                                                 iconNode={Heart}
-                                                                className="h-4 w-4"
+                                                                className="h-3 w-3 sm:h-4 sm:w-4"
                                                             />
                                                             {
                                                                 discussion.likes_count
@@ -440,8 +444,8 @@ export default function ForumIndex({
                                         href={`/forum/${discussion.slug}`}
                                     >
                                         <Card className="transition-all hover:border-primary hover:shadow-md">
-                                            <CardContent className="p-4">
-                                                <div className="flex items-start gap-4">
+                                            <CardContent className="p-3 sm:p-4">
+                                                <div className="flex items-start gap-2 sm:gap-4">
                                                     <img
                                                         src={
                                                             discussion.user
@@ -450,11 +454,12 @@ export default function ForumIndex({
                                                         alt={
                                                             discussion.user.name
                                                         }
-                                                        className="h-10 w-10 rounded-full"
+                                                        className="h-8 w-8 flex-shrink-0 rounded-full sm:h-10 sm:w-10"
                                                     />
-                                                    <div className="flex-1">
+                                                    <div className="min-w-0 flex-1">
                                                         <Badge
                                                             variant="outline"
+                                                            className="text-xs"
                                                             style={{
                                                                 borderColor:
                                                                     discussion
@@ -471,10 +476,10 @@ export default function ForumIndex({
                                                                     .name
                                                             }
                                                         </Badge>
-                                                        <h3 className="mt-1 font-semibold hover:text-primary">
+                                                        <h3 className="mt-1 line-clamp-2 text-sm font-semibold hover:text-primary sm:text-base">
                                                             {discussion.title}
                                                         </h3>
-                                                        <p className="text-sm text-muted-foreground">
+                                                        <p className="truncate text-xs text-muted-foreground sm:text-sm">
                                                             {
                                                                 discussion.user
                                                                     .name
@@ -484,13 +489,13 @@ export default function ForumIndex({
                                                                 discussion.last_activity_at,
                                                             )}
                                                         </p>
-                                                        <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                                                        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground sm:gap-4 sm:text-sm">
                                                             <span className="flex items-center gap-1">
                                                                 <Icon
                                                                     iconNode={
                                                                         Eye
                                                                     }
-                                                                    className="h-4 w-4"
+                                                                    className="h-3 w-3 sm:h-4 sm:w-4"
                                                                 />
                                                                 {
                                                                     discussion.views_count
@@ -501,7 +506,7 @@ export default function ForumIndex({
                                                                     iconNode={
                                                                         MessageSquare
                                                                     }
-                                                                    className="h-4 w-4"
+                                                                    className="h-3 w-3 sm:h-4 sm:w-4"
                                                                 />
                                                                 {
                                                                     discussion.replies_count
@@ -512,7 +517,7 @@ export default function ForumIndex({
                                                                     iconNode={
                                                                         Heart
                                                                     }
-                                                                    className="h-4 w-4"
+                                                                    className="h-3 w-3 sm:h-4 sm:w-4"
                                                                 />
                                                                 {
                                                                     discussion.likes_count
@@ -529,7 +534,7 @@ export default function ForumIndex({
 
                             {/* Pagination */}
                             {discussions.last_page > 1 && (
-                                <div className="flex items-center justify-center gap-2">
+                                <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
                                     {discussions.links.map((link, index) => {
                                         if (link.label.includes('Previous')) {
                                             return (
@@ -542,10 +547,11 @@ export default function ForumIndex({
                                                         link.url &&
                                                         router.get(link.url)
                                                     }
+                                                    className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                                                 >
                                                     <Icon
                                                         iconNode={ChevronLeft}
-                                                        className="h-4 w-4"
+                                                        className="h-3 w-3 sm:h-4 sm:w-4"
                                                     />
                                                 </Button>
                                             );
@@ -562,10 +568,11 @@ export default function ForumIndex({
                                                         link.url &&
                                                         router.get(link.url)
                                                     }
+                                                    className="h-8 w-8 p-0 sm:h-9 sm:w-9"
                                                 >
                                                     <Icon
                                                         iconNode={ChevronRight}
-                                                        className="h-4 w-4"
+                                                        className="h-3 w-3 sm:h-4 sm:w-4"
                                                     />
                                                 </Button>
                                             );
@@ -584,6 +591,7 @@ export default function ForumIndex({
                                                     link.url &&
                                                     router.get(link.url)
                                                 }
+                                                className="h-8 min-w-[2rem] px-2 text-xs sm:h-9 sm:min-w-[2.25rem] sm:px-3 sm:text-sm"
                                             >
                                                 {link.label}
                                             </Button>
