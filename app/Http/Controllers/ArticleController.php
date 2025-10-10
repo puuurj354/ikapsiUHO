@@ -67,10 +67,10 @@ class ArticleController extends Controller
     /**
      * Show edit form
      */
-    public function edit(Article $article): Response
+    public function edit(Request $request, Article $article): Response
     {
         // Authorization check
-        if (!$article->isOwnedBy(auth()->user())) {
+        if (!$article->isOwnedBy($request->user())) {
             abort(403, 'Anda tidak memiliki akses untuk mengedit artikel ini.');
         }
 
@@ -99,7 +99,7 @@ class ArticleController extends Controller
     public function destroy(Article $article): RedirectResponse
     {
         // Authorization check
-        if (!$article->isOwnedBy(auth()->user())) {
+        if (!$article->isOwnedBy(request()->user())) {
             abort(403, 'Anda tidak memiliki akses untuk menghapus artikel ini.');
         }
 
@@ -112,10 +112,10 @@ class ArticleController extends Controller
     /**
      * Toggle publish status
      */
-    public function togglePublish(Article $article): RedirectResponse
+    public function togglePublish(Request $request, Article $article): RedirectResponse
     {
         // Authorization check
-        if (!$article->isOwnedBy(auth()->user())) {
+        if (!$article->isOwnedBy($request->user())) {
             abort(403);
         }
 

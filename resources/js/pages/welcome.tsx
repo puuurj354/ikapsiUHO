@@ -8,14 +8,45 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
+    Calendar,
+    Clock,
+    Eye,
     Info,
     LayoutDashboard,
+    User,
     UserPlus,
     Users,
 } from 'lucide-react';
 
-export default function Welcome() {
+interface Article {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt: string | null;
+    featured_image_url: string;
+    published_at: string;
+    views_count: number;
+    reading_time: string;
+    author: {
+        id: number;
+        name: string;
+    };
+}
+
+interface WelcomeProps {
+    featuredArticles: Article[];
+}
+
+export default function Welcome({ featuredArticles }: WelcomeProps) {
     const { auth } = usePage<SharedData>().props;
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+    };
 
     return (
         <>
@@ -151,43 +182,136 @@ export default function Welcome() {
                 {/* Statistics Section */}
                 <StatisticsSection />
 
-                {/* Articles Preview Section */}
-                <section className="py-20 lg:py-32">
-                    <div className="container mx-auto px-4 lg:px-8">
-                        <div className="mb-12 flex items-end justify-between">
-                            <div>
-                                <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
-                                    Artikel Terbaru
-                                </h2>
-                                <p className="max-w-2xl text-lg text-muted-foreground">
-                                    Baca wawasan dan pengalaman dari para alumni
-                                </p>
+                {/* Featured Articles Section */}
+                {featuredArticles && featuredArticles.length > 0 && (
+                    <section className="py-20 lg:py-32">
+                        <div className="container mx-auto px-4 lg:px-8">
+                            <div className="mb-12 flex items-end justify-between">
+                                <div>
+                                    <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
+                                        Artikel Terbaru
+                                    </h2>
+                                    <p className="max-w-2xl text-lg text-muted-foreground">
+                                        Baca wawasan dan pengalaman dari para
+                                        alumni
+                                    </p>
+                                </div>
+                                <Link
+                                    href="/articles"
+                                    className="hidden items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:inline-flex"
+                                >
+                                    Lihat Semua
+                                    <Icon
+                                        iconNode={ArrowRight}
+                                        className="h-4 w-4"
+                                    />
+                                </Link>
                             </div>
-                            <Link
-                                href="/articles"
-                                className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-                            >
-                                Lihat Semua
-                                <Icon
-                                    iconNode={ArrowRight}
-                                    className="h-4 w-4"
-                                />
-                            </Link>
+
+                            {/* Featured Articles Grid */}
+                            <div className="grid gap-8 md:grid-cols-2">
+                                {featuredArticles.map((article) => (
+                                    <Link
+                                        key={article.id}
+                                        href={`/articles/${article.slug}`}
+                                        className="group overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-xl"
+                                    >
+                                        {/* Featured Image */}
+                                        {article.featured_image_url ? (
+                                            <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+                                                <img
+                                                    src={
+                                                        article.featured_image_url
+                                                    }
+                                                    alt={article.title}
+                                                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/20 to-primary/5">
+                                                <div className="flex h-full items-center justify-center">
+                                                    <Icon
+                                                        iconNode={Users}
+                                                        className="h-16 w-16 text-primary/40"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Content */}
+                                        <div className="p-6">
+                                            <h3 className="mb-3 text-2xl font-bold transition-colors group-hover:text-primary">
+                                                {article.title}
+                                            </h3>
+                                            {article.excerpt && (
+                                                <p className="mb-4 line-clamp-3 text-muted-foreground">
+                                                    {article.excerpt}
+                                                </p>
+                                            )}
+
+                                            {/* Meta Info */}
+                                            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                                                <div className="flex items-center gap-2">
+                                                    <Icon
+                                                        iconNode={User}
+                                                        className="h-4 w-4"
+                                                    />
+                                                    <span>
+                                                        {article.author.name}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Icon
+                                                        iconNode={Calendar}
+                                                        className="h-4 w-4"
+                                                    />
+                                                    <span>
+                                                        {formatDate(
+                                                            article.published_at,
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Icon
+                                                        iconNode={Clock}
+                                                        className="h-4 w-4"
+                                                    />
+                                                    <span>
+                                                        {article.reading_time}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Icon
+                                                        iconNode={Eye}
+                                                        className="h-4 w-4"
+                                                    />
+                                                    <span>
+                                                        {article.views_count}{' '}
+                                                        views
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+
+                            {/* View All Button - Mobile */}
+                            <div className="mt-8 text-center sm:hidden">
+                                <Link
+                                    href="/articles"
+                                    className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                                >
+                                    Lihat Semua Artikel
+                                    <Icon
+                                        iconNode={ArrowRight}
+                                        className="h-5 w-5"
+                                    />
+                                </Link>
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <Link
-                                href="/articles"
-                                className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                            >
-                                Jelajahi Artikel
-                                <Icon
-                                    iconNode={ArrowRight}
-                                    className="h-5 w-5"
-                                />
-                            </Link>
-                        </div>
-                    </div>
-                </section>
+                    </section>
+                )}
 
                 {/* Features Section */}
                 <section id="tentang" className="py-20 lg:py-32">

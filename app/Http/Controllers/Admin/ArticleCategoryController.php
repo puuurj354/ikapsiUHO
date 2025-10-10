@@ -25,7 +25,7 @@ class ArticleCategoryController extends Controller
             $query->where('name', 'like', "%{$search}%");
         }
 
-        $categories = $query->ordered()->paginate(15);
+        $categories = $query->ordered()->get();
 
         return Inertia::render('admin/articles/categories', [
             'categories' => $categories,

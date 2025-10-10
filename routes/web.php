@@ -12,18 +12,17 @@ use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ForumReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicArticleController;
+use App\Services\ArticleService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::get('/', function (ArticleService $articleService) {
+    $featuredArticles = $articleService->getRecentArticles(2);
 
-// Public article routes
-Route::prefix('articles')->name('articles.')->group(function () {
-    Route::get('/', [PublicArticleController::class, 'index'])->name('index');
-    Route::get('{slug}', [PublicArticleController::class, 'show'])->name('show');
-});
+    return Inertia::render('welcome', [
+        'featuredArticles' => $featuredArticles,
+    ]);
+})->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -69,13 +68,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Article routes - authenticated users can manage their articles
     Route::prefix('articles')->name('articles.')->group(function () {
-        Route::get('/my-articles', [ArticleController::class, 'index'])->name('my-articles');
-        Route::get('/create', [ArticleController::class, 'create'])->name('create');
+        Route::get('my-articles', [ArticleController::class, 'index'])->name('my-articles');
+        Route::get('create', [ArticleController::class, 'create'])->name('create');
         Route::post('/', [ArticleController::class, 'store'])->name('store');
-        Route::get('/{article}/edit', [ArticleController::class, 'edit'])->name('edit');
-        Route::patch('/{article}', [ArticleController::class, 'update'])->name('update');
-        Route::delete('/{article}', [ArticleController::class, 'destroy'])->name('destroy');
-        Route::post('/{article}/toggle-publish', [ArticleController::class, 'togglePublish'])->name('toggle-publish');
+        Route::get('{article}/edit', [ArticleController::class, 'edit'])->name('edit');
+        Route::patch('{article}', [ArticleController::class, 'update'])->name('update');
+        Route::delete('{article}', [ArticleController::class, 'destroy'])->name('destroy');
+        Route::post('{article}/toggle-publish', [ArticleController::class, 'togglePublish'])->name('toggle-publish');
     });
 
     // Notification routes
@@ -87,6 +86,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
+});
+
+// Public article routes (must be after authenticated routes to avoid conflicts)
+Route::prefix('articles')->name('articles.')->group(function () {
+    Route::get('/', [PublicArticleController::class, 'index'])->name('public.index');
+    Route::get('{slug}', [PublicArticleController::class, 'show'])->name('public.show');
 });
 
 // Admin routes - protected by admin middleware
