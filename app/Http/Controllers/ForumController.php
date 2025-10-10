@@ -2,80 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ForumCategory;
-use App\Models\ForumDiscussion;
-use App\Models\ForumLike;
-use App\Models\ForumReply;
+use App\Services\ForumService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ForumController extends Controller
 {
+    protected ForumService $forumService;
+
+    public function __construct(ForumService $forumService)
+    {
+        $this->forumService = $forumService;
+    }
     /**
      * Display a listing of forum discussions.
      */
     public function index(Request $request): Response
     {
-        $search = $request->input('search');
-        $categoryId = $request->input('category');
-        $sort = $request->input('sort', 'recent'); // recent, popular, oldest
+        $data = $this->forumService->getIndexData($request);
 
-        $query = ForumDiscussion::with(['user', 'category'])
-            ->withCount('replies');
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%");
-            });
-        }
-
-        if ($categoryId) {
-            $query->where('forum_category_id', $categoryId);
-        }
-
-        // Apply sorting
-        switch ($sort) {
-            case 'popular':
-                $query->popular();
-                break;
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'recent':
-            default:
-                $query->recent();
-                break;
-        }
-
-        // Pinned discussions always on top
-        $pinnedDiscussions = ForumDiscussion::with(['user', 'category'])
-            ->withCount('replies')
-            ->pinned()
-            ->get();
-
-        $discussions = $query->where('is_pinned', false)
-            ->paginate(20)
-            ->withQueryString();
-
-        $categories = ForumCategory::where('is_active', true)
-            ->orderBy('order')
-            ->get();
-
-        return Inertia::render('forum/index', [
-            'pinnedDiscussions' => $pinnedDiscussions,
-            'discussions' => $discussions,
-            'categories' => $categories,
-            'filters' => [
-                'search' => $search,
-                'category' => $categoryId,
-                'sort' => $sort,
-            ],
-        ]);
+        return Inertia::render('forum/index', $data);
     }
 
     /**
@@ -83,9 +32,7 @@ class ForumController extends Controller
      */
     public function create(): Response
     {
-        $categories = ForumCategory::where('is_active', true)
-            ->orderBy('order')
-            ->get();
+        $categories = $this->forumService->getCategories();
 
         return Inertia::render('forum/create', [
             'categories' => $categories,
@@ -103,7 +50,7 @@ class ForumController extends Controller
             'forum_category_id' => 'required|exists:forum_categories,id',
         ]);
 
-        $discussion = $request->user()->forumDiscussions()->create($validated);
+        $discussion = $this->forumService->createDiscussion($validated, $request->user());
 
         return redirect()->route('forum.show', $discussion->slug)
             ->with('success', 'Diskusi berhasil dibuat!');
@@ -114,24 +61,9 @@ class ForumController extends Controller
      */
     public function show(string $slug): Response
     {
-        $discussion = ForumDiscussion::with(['user', 'category'])
-            ->withCount('replies', 'likes')
-            ->where('slug', $slug)
-            ->firstOrFail();
+        $data = $this->forumService->getDiscussionData($slug);
 
-        // Increment views
-        $discussion->incrementViews();
-
-        $replies = ForumReply::with(['user'])
-            ->where('forum_discussion_id', $discussion->id)
-            ->whereNull('parent_id')
-            ->orderBy('created_at', 'asc')
-            ->paginate(20);
-
-        return Inertia::render('forum/show', [
-            'discussion' => $discussion,
-            'replies' => $replies,
-        ]);
+        return Inertia::render('forum/show', $data);
     }
 
     /**
@@ -139,16 +71,13 @@ class ForumController extends Controller
      */
     public function edit(string $slug): Response
     {
-        $discussion = ForumDiscussion::where('slug', $slug)->firstOrFail();
+        $discussion = \App\Models\ForumDiscussion::where('slug', $slug)->firstOrFail();
 
-        // Authorize
-        if ($discussion->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        if (!$this->forumService->canEditDiscussion($discussion)) {
             abort(403);
         }
 
-        $categories = ForumCategory::where('is_active', true)
-            ->orderBy('order')
-            ->get();
+        $categories = $this->forumService->getCategories();
 
         return Inertia::render('forum/edit', [
             'discussion' => $discussion,
@@ -161,10 +90,9 @@ class ForumController extends Controller
      */
     public function update(Request $request, string $slug): RedirectResponse
     {
-        $discussion = ForumDiscussion::where('slug', $slug)->firstOrFail();
+        $discussion = \App\Models\ForumDiscussion::where('slug', $slug)->firstOrFail();
 
-        // Authorize
-        if ($discussion->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        if (!$this->forumService->canEditDiscussion($discussion)) {
             abort(403);
         }
 
@@ -174,7 +102,7 @@ class ForumController extends Controller
             'forum_category_id' => 'required|exists:forum_categories,id',
         ]);
 
-        $discussion->update($validated);
+        $this->forumService->updateDiscussion($discussion, $validated);
 
         return redirect()->route('forum.show', $discussion->slug)
             ->with('success', 'Diskusi berhasil diperbarui!');
@@ -185,14 +113,13 @@ class ForumController extends Controller
      */
     public function destroy(string $slug): RedirectResponse
     {
-        $discussion = ForumDiscussion::where('slug', $slug)->firstOrFail();
+        $discussion = \App\Models\ForumDiscussion::where('slug', $slug)->firstOrFail();
 
-        // Authorize
-        if ($discussion->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        if (!$this->forumService->canDeleteDiscussion($discussion)) {
             abort(403);
         }
 
-        $discussion->delete();
+        $this->forumService->deleteDiscussion($discussion);
 
         return redirect()->route('forum.index')
             ->with('success', 'Diskusi berhasil dihapus!');
@@ -203,9 +130,9 @@ class ForumController extends Controller
      */
     public function storeReply(Request $request, string $slug): RedirectResponse
     {
-        $discussion = ForumDiscussion::where('slug', $slug)->firstOrFail();
+        $discussion = \App\Models\ForumDiscussion::where('slug', $slug)->firstOrFail();
 
-        if ($discussion->is_locked && !Auth::user()->isAdmin()) {
+        if ($this->forumService->isDiscussionLocked($discussion)) {
             return back()->withErrors(['error' => 'Diskusi ini telah dikunci.']);
         }
 
@@ -214,14 +141,7 @@ class ForumController extends Controller
             'parent_id' => 'nullable|exists:forum_replies,id',
         ]);
 
-        $reply = $discussion->replies()->create([
-            'user_id' => auth()->id(),
-            'content' => $validated['content'],
-            'parent_id' => $validated['parent_id'] ?? null,
-        ]);
-
-        // Update discussion
-        $discussion->updateRepliesCount();
+        $this->forumService->createReply($discussion, $validated);
 
         return back()->with('success', 'Balasan berhasil ditambahkan!');
     }
@@ -231,24 +151,9 @@ class ForumController extends Controller
      */
     public function toggleLike(string $slug): RedirectResponse
     {
-        $discussion = ForumDiscussion::where('slug', $slug)->firstOrFail();
+        $discussion = \App\Models\ForumDiscussion::where('slug', $slug)->firstOrFail();
 
-        $existingLike = ForumLike::where('user_id', Auth::id())
-            ->where('likeable_type', ForumDiscussion::class)
-            ->where('likeable_id', $discussion->id)
-            ->first();
-
-        if ($existingLike) {
-            $existingLike->delete();
-        } else {
-            ForumLike::create([
-                'user_id' => Auth::id(),
-                'likeable_type' => ForumDiscussion::class,
-                'likeable_id' => $discussion->id,
-            ]);
-        }
-
-        $discussion->updateLikesCount();
+        $this->forumService->toggleDiscussionLike($discussion);
 
         return back();
     }
@@ -256,24 +161,9 @@ class ForumController extends Controller
     /**
      * Toggle like on a reply.
      */
-    public function toggleReplyLike(ForumReply $reply): RedirectResponse
+    public function toggleReplyLike(\App\Models\ForumReply $reply): RedirectResponse
     {
-        $existingLike = ForumLike::where('user_id', Auth::id())
-            ->where('likeable_type', ForumReply::class)
-            ->where('likeable_id', $reply->id)
-            ->first();
-
-        if ($existingLike) {
-            $existingLike->delete();
-        } else {
-            ForumLike::create([
-                'user_id' => Auth::id(),
-                'likeable_type' => ForumReply::class,
-                'likeable_id' => $reply->id,
-            ]);
-        }
-
-        $reply->updateLikesCount();
+        $this->forumService->toggleReplyLike($reply);
 
         return back();
     }
@@ -283,13 +173,9 @@ class ForumController extends Controller
      */
     public function togglePin(string $slug): RedirectResponse
     {
-        if (!Auth::user()->isAdmin()) {
-            abort(403);
-        }
+        $discussion = \App\Models\ForumDiscussion::where('slug', $slug)->firstOrFail();
 
-        $discussion = ForumDiscussion::where('slug', $slug)->firstOrFail();
-        $discussion->is_pinned = !$discussion->is_pinned;
-        $discussion->save();
+        $this->forumService->togglePin($discussion);
 
         return back()->with('success', $discussion->is_pinned ? 'Diskusi berhasil di-pin!' : 'Diskusi berhasil di-unpin!');
     }
@@ -299,13 +185,9 @@ class ForumController extends Controller
      */
     public function toggleLock(string $slug): RedirectResponse
     {
-        if (!Auth::user()->isAdmin()) {
-            abort(403);
-        }
+        $discussion = \App\Models\ForumDiscussion::where('slug', $slug)->firstOrFail();
 
-        $discussion = ForumDiscussion::where('slug', $slug)->firstOrFail();
-        $discussion->is_locked = !$discussion->is_locked;
-        $discussion->save();
+        $this->forumService->toggleLock($discussion);
 
         return back()->with('success', $discussion->is_locked ? 'Diskusi berhasil dikunci!' : 'Diskusi berhasil dibuka!');
     }
