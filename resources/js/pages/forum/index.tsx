@@ -14,17 +14,23 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import {
+    Briefcase,
+    Calendar,
     ChevronLeft,
     ChevronRight,
     Eye,
+    GraduationCap,
     Heart,
+    HelpCircle,
     MessageSquare,
     Pin,
     Plus,
     Search,
     TrendingUp,
+    Users,
+    type LucideProps,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ComponentType } from 'react';
 
 interface User {
     id: number;
@@ -92,14 +98,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Icon mapping
-const iconMap: Record<string, unknown> = {
+const iconMap: Record<string, ComponentType<LucideProps>> = {
     MessageSquare,
-    Users: MessageSquare,
-    Calendar: MessageSquare,
+    Users,
+    Calendar,
     TrendingUp,
-    Briefcase: MessageSquare,
-    GraduationCap: MessageSquare,
-    HelpCircle: MessageSquare,
+    Briefcase,
+    GraduationCap,
+    HelpCircle,
 };
 
 export default function ForumIndex({
@@ -115,7 +121,7 @@ export default function ForumIndex({
     const [sortBy, setSortBy] = useState(filters.sort || 'recent');
 
     // Handle filter changes
-    const handleFilter = () => {
+    const handleFilter = useCallback(() => {
         router.get(
             '/forum',
             {
@@ -129,7 +135,7 @@ export default function ForumIndex({
                 preserveScroll: true,
             },
         );
-    };
+    }, [search, selectedCategory, sortBy]);
 
     // Auto-filter when filters change
     useEffect(() => {
@@ -138,7 +144,7 @@ export default function ForumIndex({
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [search, selectedCategory, sortBy]);
+    }, [search, selectedCategory, sortBy, handleFilter]);
 
     // Format date
     const formatDate = (dateString: string) => {
@@ -306,7 +312,7 @@ export default function ForumIndex({
                             <Icon iconNode={Pin} className="h-5 w-5" />
                             Diskusi yang Di-pin
                         </h2>
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                             {pinnedDiscussions.map((discussion) => (
                                 <Link
                                     key={discussion.id}
@@ -427,7 +433,7 @@ export default function ForumIndex({
                         </Card>
                     ) : (
                         <>
-                            <div className="space-y-2">
+                            <div className="space-y-4">
                                 {discussions.data.map((discussion) => (
                                     <Link
                                         key={discussion.id}

@@ -512,3 +512,6 @@ export default function ShowDiscussion({
         </AppLayout>
     );
 }
+function setReplyingTo(arg0: null) {
+    throw new Error('Function not implemented.');
+}

@@ -56,6 +56,14 @@ class ForumReply extends Model
     }
 
     /**
+     * Get the reports for the reply.
+     */
+    public function reports(): MorphMany
+    {
+        return $this->morphMany(ForumReport::class, 'reportable');
+    }
+
+    /**
      * Check if the reply is liked by the current user.
      */
     public function getIsLikedByCurrentUserAttribute(): bool
