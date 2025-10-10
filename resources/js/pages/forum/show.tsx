@@ -263,7 +263,7 @@ export default function ShowDiscussion({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${discussion.title} - Forum`} />
 
-            <div className="mx-auto max-w-5xl space-y-6">
+            <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 md:px-6">
                 {/* Back Button */}
                 <Link href="/forum">
                     <Button variant="ghost" size="sm">

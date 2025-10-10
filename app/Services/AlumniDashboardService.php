@@ -18,6 +18,7 @@ class AlumniDashboardService
             'user_profile' => [
                 'name' => $user->name,
                 'email' => $user->email,
+                'profile_picture_url' => $user->profile_picture_url,
                 'angkatan' => $user->angkatan,
                 'profesi' => $user->profesi,
                 'bio' => $user->bio,

@@ -22,7 +22,9 @@ class ForumService
         $categoryId = $request->input('category');
         $sort = $request->input('sort', 'recent'); // recent, popular, oldest
 
-        $query = ForumDiscussion::with(['user', 'category'])
+        $query = ForumDiscussion::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }, 'category'])
             ->withCount('replies');
 
         if ($search) {
@@ -51,7 +53,9 @@ class ForumService
         }
 
         // Pinned discussions always on top
-        $pinnedDiscussions = ForumDiscussion::with(['user', 'category'])
+        $pinnedDiscussions = ForumDiscussion::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }, 'category'])
             ->withCount('replies')
             ->pinned()
             ->get();
@@ -99,7 +103,9 @@ class ForumService
      */
     public function getDiscussionData(string $slug): array
     {
-        $discussion = ForumDiscussion::with(['user', 'category'])
+        $discussion = ForumDiscussion::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }, 'category'])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -107,7 +113,9 @@ class ForumService
         $this->trackView($discussion);
 
         // Get all replies (including nested ones) with user relationship
-        $replies = ForumReply::with(['user'])
+        $replies = ForumReply::with(['user' => function ($query) {
+            $query->select('id', 'name', 'email', 'profile_picture', 'role');
+        }])
             ->where('forum_discussion_id', $discussion->id)
             ->orderBy('parent_id', 'asc') // Parent replies first
             ->orderBy('created_at', 'asc')
