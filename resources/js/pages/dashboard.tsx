@@ -368,32 +368,35 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                             <Link
                                 href="/alumni/directory"
-                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
                             >
                                 <Icon
                                     iconNode={Users}
-                                    className="h-5 w-5 text-primary"
+                                    className="h-5 w-5 text-primary transition-transform hover:scale-110"
                                 />
                                 <span className="font-medium">
                                     Direktori Alumni
                                 </span>
                             </Link>
-                            <div className="flex items-center space-x-3 rounded-lg border p-4">
+                            <Link
+                                href="/forum"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
+                            >
                                 <Icon
                                     iconNode={MessageSquare}
-                                    className="h-5 w-5 text-primary"
+                                    className="h-5 w-5 text-primary transition-transform hover:scale-110"
                                 />
                                 <span className="font-medium">
                                     Forum Diskusi
                                 </span>
-                            </div>
+                            </Link>
                             <Link
                                 href="/events"
-                                className="flex items-center space-x-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                                className="flex items-center space-x-3 rounded-lg border p-4 transition-all hover:border-primary hover:bg-primary/5 hover:shadow-md"
                             >
                                 <Icon
                                     iconNode={Calendar}
-                                    className="h-5 w-5 text-primary"
+                                    className="h-5 w-5 text-primary transition-transform hover:scale-110"
                                 />
                                 <span className="font-medium">
                                     Event & Kegiatan

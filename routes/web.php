@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AlumniDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\ForumController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,6 +29,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{event}', [EventController::class, 'show'])->name('show');
         Route::post('{event}/register', [EventController::class, 'register'])->name('register');
         Route::post('{event}/cancel', [EventController::class, 'cancelRegistration'])->name('cancel');
+    });
+
+    // Forum routes (for all authenticated users)
+    Route::prefix('forum')->name('forum.')->group(function () {
+        Route::get('/', [ForumController::class, 'index'])->name('index');
+        Route::get('create', [ForumController::class, 'create'])->name('create');
+        Route::post('/', [ForumController::class, 'store'])->name('store');
+        Route::get('{slug}', [ForumController::class, 'show'])->name('show');
+        Route::get('{slug}/edit', [ForumController::class, 'edit'])->name('edit');
+        Route::patch('{slug}', [ForumController::class, 'update'])->name('update');
+        Route::delete('{slug}', [ForumController::class, 'destroy'])->name('destroy');
+
+        // Discussion actions
+        Route::post('{slug}/like', [ForumController::class, 'toggleLike'])->name('like');
+        Route::post('{slug}/pin', [ForumController::class, 'togglePin'])->name('pin');
+        Route::post('{slug}/lock', [ForumController::class, 'toggleLock'])->name('lock');
+        Route::post('{slug}/reply', [ForumController::class, 'storeReply'])->name('reply');
+
+        // Reply actions
+        Route::post('reply/{reply}/like', [ForumController::class, 'toggleReplyLike'])->name('reply.like');
     });
 });
 

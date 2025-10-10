@@ -13,7 +13,14 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Calendar, Folder, LayoutGrid, Users } from 'lucide-react';
+import {
+    BookOpen,
+    Calendar,
+    Folder,
+    LayoutGrid,
+    MessageSquare,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
@@ -50,6 +57,11 @@ export function AppSidebar() {
                   href: '/admin/events',
                   icon: Calendar,
               },
+              {
+                  title: 'Forum Diskusi',
+                  href: '/forum',
+                  icon: MessageSquare,
+              },
           ]
         : [
               {
@@ -66,6 +78,11 @@ export function AppSidebar() {
                   title: 'Event',
                   href: '/events',
                   icon: Calendar,
+              },
+              {
+                  title: 'Forum Diskusi',
+                  href: '/forum',
+                  icon: MessageSquare,
               },
           ];
 

@@ -115,4 +115,28 @@ class User extends Authenticatable
         // Return default avatar based on name initial
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
     }
+
+    /**
+     * Get forum discussions created by this user
+     */
+    public function forumDiscussions()
+    {
+        return $this->hasMany(ForumDiscussion::class);
+    }
+
+    /**
+     * Get forum replies created by this user
+     */
+    public function forumReplies()
+    {
+        return $this->hasMany(ForumReply::class);
+    }
+
+    /**
+     * Get forum likes created by this user
+     */
+    public function forumLikes()
+    {
+        return $this->hasMany(ForumLike::class);
+    }
 }
