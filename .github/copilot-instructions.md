@@ -161,3 +161,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 - The content should be about ikapsiUHO (alumni Psikologi Universitas Halu Oleo)
 - The content should be placed in the welcome.tsx file in the resources/js/pages directory
 - This web is about ikapsiUHO (alumni Psikologi Universitas Halu Oleo)
+
+### Backend Architecture
+
+- Services layer handles business logic
+- Controllers handle HTTP requests and responses
