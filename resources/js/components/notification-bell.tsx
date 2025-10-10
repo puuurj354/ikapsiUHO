@@ -12,6 +12,7 @@ import {
     Bell,
     Check,
     Heart,
+    Loader2,
     MessageSquare,
     Sparkles,
     X,
@@ -47,15 +48,24 @@ export function NotificationBell({ className }: NotificationBellProps) {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const fetchNotifications = async () => {
         try {
+            setIsLoading(true);
             const response = await fetch('/notifications/unread');
+            if (!response.ok) {
+                throw new Error('Failed to fetch notifications');
+            }
             const data = await response.json();
-            setNotifications(data.notifications);
-            setUnreadCount(data.unread_count);
+            setNotifications(data.notifications || []);
+            setUnreadCount(data.unread_count || 0);
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
+            setNotifications([]);
+            setUnreadCount(0);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -184,13 +194,19 @@ export function NotificationBell({ className }: NotificationBellProps) {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className={`relative ${className}`}
+                    className={`group relative h-9 w-9 ${className}`}
                 >
-                    <Bell className="h-5 w-5" />
-                    {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                            {unreadCount > 9 ? '9+' : unreadCount}
-                        </span>
+                    {isLoading ? (
+                        <Loader2 className="!size-5 animate-spin opacity-80" />
+                    ) : (
+                        <>
+                            <Bell className="!size-5 opacity-80 group-hover:opacity-100" />
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </>
                     )}
                 </Button>
             </DropdownMenuTrigger>

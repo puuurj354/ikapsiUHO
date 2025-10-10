@@ -73,66 +73,50 @@ export default function NotificationsIndex({ notifications }: Props) {
     };
 
     const markAsRead = async (notificationId: string) => {
-        await fetch(`/notifications/${notificationId}/read`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN':
-                    document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute('content') || '',
+        router.post(
+            `/notifications/${notificationId}/read`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    router.reload({ only: ['notifications'] });
+                },
             },
-        });
-
-        router.reload({ only: ['notifications'] });
+        );
     };
 
     const markAllAsRead = async () => {
-        await fetch('/notifications/read-all', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN':
-                    document
-                        .querySelector('meta[name="csrf-token"]')
-                        ?.getAttribute('content') || '',
+        router.post(
+            '/notifications/read-all',
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    router.reload({ only: ['notifications'] });
+                },
             },
-        });
-
-        router.reload({ only: ['notifications'] });
+        );
     };
 
     const deleteNotification = async (notificationId: string) => {
         if (confirm('Hapus notifikasi ini?')) {
-            await fetch(`/notifications/${notificationId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute('content') || '',
+            router.delete(`/notifications/${notificationId}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    router.reload({ only: ['notifications'] });
                 },
             });
-
-            router.reload({ only: ['notifications'] });
         }
     };
 
     const deleteAll = async () => {
         if (confirm('Hapus semua notifikasi?')) {
-            await fetch('/notifications', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute('content') || '',
+            router.delete('/notifications', {
+                preserveScroll: true,
+                onSuccess: () => {
+                    router.reload({ only: ['notifications'] });
                 },
             });
-
-            router.reload({ only: ['notifications'] });
         }
     };
 
