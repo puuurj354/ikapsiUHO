@@ -151,18 +151,18 @@ export default function NotificationsIndex({ notifications }: Props) {
 
             <div className="container mx-auto space-y-6 py-6 sm:py-8">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                             Notifikasi
                         </h1>
-                        <p className="text-sm sm:text-base text-muted-foreground">
+                        <p className="text-sm text-muted-foreground sm:text-base">
                             {unreadCount > 0
                                 ? `${unreadCount} notifikasi belum dibaca`
                                 : 'Semua notifikasi sudah dibaca'}
                         </p>
                     </div>
-                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <div className="flex w-full flex-wrap gap-2 sm:w-auto">
                         {unreadCount > 0 && (
                             <Button
                                 variant="outline"
@@ -179,7 +179,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                                 variant="outline"
                                 size="sm"
                                 onClick={deleteAll}
-                                className="flex-1 sm:flex-initial text-red-600 hover:text-red-700"
+                                className="flex-1 text-red-600 hover:text-red-700 sm:flex-initial"
                             >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Hapus Semua
@@ -191,12 +191,12 @@ export default function NotificationsIndex({ notifications }: Props) {
                 {/* Notifications List */}
                 {notifications.data.length === 0 ? (
                     <Card>
-                        <CardContent className="flex flex-col items-center justify-center py-16 sm:py-20 text-center">
-                            <Bell className="mb-4 h-16 w-16 sm:h-20 sm:w-20 text-gray-400" />
-                            <h3 className="text-lg sm:text-xl font-semibold">
+                        <CardContent className="flex flex-col items-center justify-center py-16 text-center sm:py-20">
+                            <Bell className="mb-4 h-16 w-16 text-gray-400 sm:h-20 sm:w-20" />
+                            <h3 className="text-lg font-semibold sm:text-xl">
                                 Tidak ada notifikasi
                             </h3>
-                            <p className="text-sm sm:text-base text-muted-foreground">
+                            <p className="text-sm text-muted-foreground sm:text-base">
                                 Notifikasi Anda akan muncul di sini
                             </p>
                         </CardContent>
@@ -204,7 +204,9 @@ export default function NotificationsIndex({ notifications }: Props) {
                 ) : (
                     <div className="space-y-3 sm:space-y-4">
                         {notifications.data.map((notification) => {
-                            const IconComponent = getIcon(notification.data.icon);
+                            const IconComponent = getIcon(
+                                notification.data.icon,
+                            );
 
                             return (
                                 <Card
@@ -221,11 +223,12 @@ export default function NotificationsIndex({ notifications }: Props) {
                                     <CardContent className="p-4 sm:p-6">
                                         <div className="flex items-start gap-3 sm:gap-4">
                                             <div
-                                                className={`flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-full ${
+                                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full sm:h-12 sm:w-12 ${
                                                     notification.data.type ===
                                                     'forum_reply'
                                                         ? 'bg-blue-100'
-                                                        : notification.data.type ===
+                                                        : notification.data
+                                                                .type ===
                                                             'forum_like'
                                                           ? 'bg-red-100'
                                                           : 'bg-purple-100'
@@ -233,33 +236,40 @@ export default function NotificationsIndex({ notifications }: Props) {
                                             >
                                                 <IconComponent
                                                     className={`h-5 w-5 sm:h-6 sm:w-6 ${
-                                                        notification.data.type ===
+                                                        notification.data
+                                                            .type ===
                                                         'forum_reply'
                                                             ? 'text-blue-600'
-                                                            : notification.data.type ===
+                                                            : notification.data
+                                                                    .type ===
                                                                 'forum_like'
                                                               ? 'text-red-600'
                                                               : 'text-purple-600'
                                                     }`}
                                                 />
                                             </div>
-                                            <div className="flex-1 space-y-1 min-w-0">
+                                            <div className="min-w-0 flex-1 space-y-1">
                                                 <div className="flex items-start justify-between gap-2">
-                                                    <h3 className="text-sm sm:text-base font-semibold">
-                                                        {notification.data.title}
+                                                    <h3 className="text-sm font-semibold sm:text-base">
+                                                        {
+                                                            notification.data
+                                                                .title
+                                                        }
                                                     </h3>
                                                     {!notification.read_at && (
-                                                        <span className="h-2 w-2 flex-shrink-0 rounded-full bg-blue-500 mt-1"></span>
+                                                        <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500"></span>
                                                     )}
                                                 </div>
-                                                <p className="text-xs sm:text-sm text-gray-700">
+                                                <p className="text-xs text-gray-700 sm:text-sm">
                                                     {notification.data.message}
                                                 </p>
                                                 <p className="text-xs text-gray-400">
-                                                    {formatTime(notification.created_at)}
+                                                    {formatTime(
+                                                        notification.created_at,
+                                                    )}
                                                 </p>
                                             </div>
-                                            <div className="flex flex-col gap-2 flex-shrink-0">
+                                            <div className="flex flex-shrink-0 flex-col gap-2">
                                                 {!notification.read_at && (
                                                     <Button
                                                         variant="ghost"
@@ -267,7 +277,9 @@ export default function NotificationsIndex({ notifications }: Props) {
                                                         className="h-8 w-8"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            markAsRead(notification.id);
+                                                            markAsRead(
+                                                                notification.id,
+                                                            );
                                                         }}
                                                     >
                                                         <Check className="h-4 w-4 text-blue-600" />
@@ -280,7 +292,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         deleteNotification(
-                                                            notification.id
+                                                            notification.id,
                                                         );
                                                     }}
                                                 >

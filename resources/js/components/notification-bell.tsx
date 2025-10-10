@@ -83,8 +83,10 @@ export function NotificationBell({ className }: NotificationBellProps) {
 
             setNotifications((prev) =>
                 prev.map((n) =>
-                    n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
-                )
+                    n.id === notificationId
+                        ? { ...n, read_at: new Date().toISOString() }
+                        : n,
+                ),
             );
             setUnreadCount((prev) => Math.max(0, prev - 1));
         } catch (error) {
@@ -106,7 +108,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
             });
 
             setNotifications((prev) =>
-                prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+                prev.map((n) => ({ ...n, read_at: new Date().toISOString() })),
             );
             setUnreadCount(0);
         } catch (error) {
@@ -116,7 +118,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
 
     const deleteNotification = async (
         notificationId: string,
-        e: React.MouseEvent
+        e: React.MouseEvent,
     ) => {
         e.stopPropagation();
 
@@ -132,7 +134,9 @@ export function NotificationBell({ className }: NotificationBellProps) {
                 },
             });
 
-            setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+            setNotifications((prev) =>
+                prev.filter((n) => n.id !== notificationId),
+            );
             if (!notifications.find((n) => n.id === notificationId)?.read_at) {
                 setUnreadCount((prev) => Math.max(0, prev - 1));
             }
@@ -156,12 +160,17 @@ export function NotificationBell({ className }: NotificationBellProps) {
     const formatTime = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
-        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+        const diffInSeconds = Math.floor(
+            (now.getTime() - date.getTime()) / 1000,
+        );
 
         if (diffInSeconds < 60) return 'Baru saja';
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} menit lalu`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} jam lalu`;
-        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} hari lalu`;
+        if (diffInSeconds < 3600)
+            return `${Math.floor(diffInSeconds / 60)} menit lalu`;
+        if (diffInSeconds < 86400)
+            return `${Math.floor(diffInSeconds / 3600)} jam lalu`;
+        if (diffInSeconds < 604800)
+            return `${Math.floor(diffInSeconds / 86400)} hari lalu`;
 
         return new Intl.DateTimeFormat('id-ID', {
             day: 'numeric',
@@ -215,7 +224,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
                         <div className="space-y-1 p-1">
                             {notifications.map((notification) => {
                                 const IconComponent = getIcon(
-                                    notification.data.icon
+                                    notification.data.icon,
                                 );
 
                                 return (
@@ -227,16 +236,19 @@ export function NotificationBell({ className }: NotificationBellProps) {
                                                 : 'hover:bg-gray-50'
                                         }`}
                                         onClick={() =>
-                                            handleNotificationClick(notification)
+                                            handleNotificationClick(
+                                                notification,
+                                            )
                                         }
                                     >
-                                        <div className="flex items-start gap-3 w-full">
+                                        <div className="flex w-full items-start gap-3">
                                             <div
                                                 className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
                                                     notification.data.type ===
                                                     'forum_reply'
                                                         ? 'bg-blue-100'
-                                                        : notification.data.type ===
+                                                        : notification.data
+                                                                .type ===
                                                             'forum_like'
                                                           ? 'bg-red-100'
                                                           : 'bg-purple-100'
@@ -244,25 +256,29 @@ export function NotificationBell({ className }: NotificationBellProps) {
                                             >
                                                 <IconComponent
                                                     className={`h-5 w-5 ${
-                                                        notification.data.type ===
+                                                        notification.data
+                                                            .type ===
                                                         'forum_reply'
                                                             ? 'text-blue-600'
-                                                            : notification.data.type ===
+                                                            : notification.data
+                                                                    .type ===
                                                                 'forum_like'
                                                               ? 'text-red-600'
                                                               : 'text-purple-600'
                                                     }`}
                                                 />
                                             </div>
-                                            <div className="flex-1 space-y-1 min-w-0">
-                                                <p className="text-sm font-medium leading-tight">
+                                            <div className="min-w-0 flex-1 space-y-1">
+                                                <p className="text-sm leading-tight font-medium">
                                                     {notification.data.title}
                                                 </p>
-                                                <p className="text-xs text-gray-600 line-clamp-2">
+                                                <p className="line-clamp-2 text-xs text-gray-600">
                                                     {notification.data.message}
                                                 </p>
                                                 <p className="text-xs text-gray-400">
-                                                    {formatTime(notification.created_at)}
+                                                    {formatTime(
+                                                        notification.created_at,
+                                                    )}
                                                 </p>
                                             </div>
                                             <Button
@@ -272,7 +288,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
                                                 onClick={(e) =>
                                                     deleteNotification(
                                                         notification.id,
-                                                        e
+                                                        e,
                                                     )
                                                 }
                                             >
