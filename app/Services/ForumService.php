@@ -98,22 +98,41 @@ class ForumService
     public function getDiscussionData(string $slug): array
     {
         $discussion = ForumDiscussion::with(['user', 'category'])
-            ->withCount('replies', 'likes')
             ->where('slug', $slug)
             ->firstOrFail();
 
         // Increment views
         $discussion->incrementViews();
 
+        // Get replies with user relationship
         $replies = ForumReply::with(['user'])
             ->where('forum_discussion_id', $discussion->id)
             ->whereNull('parent_id')
             ->orderBy('created_at', 'asc')
-            ->paginate(20);
+            ->get();
+
+        // Add user_liked flag to discussion
+        $discussion->user_liked = ForumLike::where('user_id', Auth::id())
+            ->where('likeable_type', ForumDiscussion::class)
+            ->where('likeable_id', $discussion->id)
+            ->exists();
+
+        // Add user_liked flag to each reply
+        $replies->each(function ($reply) {
+            $reply->user_liked = ForumLike::where('user_id', Auth::id())
+                ->where('likeable_type', ForumReply::class)
+                ->where('likeable_id', $reply->id)
+                ->exists();
+        });
+
+        $user = Auth::user();
 
         return [
             'discussion' => $discussion,
             'replies' => $replies,
+            'canEdit' => $discussion->user_id === $user->id || $user->isAdmin(),
+            'canDelete' => $discussion->user_id === $user->id || $user->isAdmin(),
+            'isAdmin' => $user->isAdmin(),
         ];
     }
 
