@@ -142,6 +142,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get articles created by this user
+     */
+    public function articles()
+    {
+        return $this->hasMany(Article::class);
+    }
+
+    /**
      * Get forum likes created by this user
      */
     public function forumLikes()

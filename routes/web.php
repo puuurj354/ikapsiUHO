@@ -1,20 +1,29 @@
 <?php
 
+use App\Http\Controllers\Admin\ArticleCategoryController;
 use App\Http\Controllers\Admin\EventManagementController as AdminEventController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AlumniDashboardController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ForumReportController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PublicArticleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
+
+// Public article routes
+Route::prefix('articles')->name('articles.')->group(function () {
+    Route::get('/', [PublicArticleController::class, 'index'])->name('index');
+    Route::get('{slug}', [PublicArticleController::class, 'show'])->name('show');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -58,6 +67,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/', [ForumReportController::class, 'store'])->name('store');
     });
 
+    // Article routes - authenticated users can manage their articles
+    Route::prefix('articles')->name('articles.')->group(function () {
+        Route::get('/my-articles', [ArticleController::class, 'index'])->name('my-articles');
+        Route::get('/create', [ArticleController::class, 'create'])->name('create');
+        Route::post('/', [ArticleController::class, 'store'])->name('store');
+        Route::get('/{article}/edit', [ArticleController::class, 'edit'])->name('edit');
+        Route::patch('/{article}', [ArticleController::class, 'update'])->name('update');
+        Route::delete('/{article}', [ArticleController::class, 'destroy'])->name('destroy');
+        Route::post('/{article}/toggle-publish', [ArticleController::class, 'togglePublish'])->name('toggle-publish');
+    });
+
     // Notification routes
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
@@ -97,6 +117,18 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::patch('{report}', [ForumReportController::class, 'update'])->name('update');
         Route::delete('{report}', [ForumReportController::class, 'deleteReported'])->name('delete-content');
     });
+
+    // Article Category Management
+    Route::prefix('articles/categories')->name('articles.categories.')->group(function () {
+        Route::get('/', [ArticleCategoryController::class, 'index'])->name('index');
+        Route::post('/', [ArticleCategoryController::class, 'store'])->name('store');
+        Route::patch('{category}', [ArticleCategoryController::class, 'update'])->name('update');
+        Route::delete('{category}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
+        Route::post('{category}/toggle-active', [ArticleCategoryController::class, 'toggleActive'])->name('toggle-active');
+    });
+
+    // Admin can delete any article
+    Route::delete('articles/{article}/force-delete', [ArticleController::class, 'destroy'])->name('articles.force-delete');
 });
 
 require __DIR__.'/settings.php';

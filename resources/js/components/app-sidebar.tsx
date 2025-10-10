@@ -18,9 +18,11 @@ import {
     Bell,
     BookOpen,
     Calendar,
+    FileText,
     Folder,
     LayoutGrid,
     MessageSquare,
+    Tag,
     Users,
 } from 'lucide-react';
 import AppLogo from './app-logo';
@@ -60,6 +62,11 @@ export function AppSidebar() {
                   icon: Calendar,
               },
               {
+                  title: 'Kategori Artikel',
+                  href: '/admin/articles/categories',
+                  icon: Tag,
+              },
+              {
                   title: 'Forum Diskusi',
                   href: '/forum',
                   icon: MessageSquare,
@@ -85,6 +92,11 @@ export function AppSidebar() {
                   title: 'Event',
                   href: '/events',
                   icon: Calendar,
+              },
+              {
+                  title: 'Artikel Saya',
+                  href: '/articles/my-articles',
+                  icon: FileText,
               },
               {
                   title: 'Forum Diskusi',

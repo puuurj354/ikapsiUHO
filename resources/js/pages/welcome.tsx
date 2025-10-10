@@ -151,6 +151,44 @@ export default function Welcome() {
                 {/* Statistics Section */}
                 <StatisticsSection />
 
+                {/* Articles Preview Section */}
+                <section className="py-20 lg:py-32">
+                    <div className="container mx-auto px-4 lg:px-8">
+                        <div className="mb-12 flex items-end justify-between">
+                            <div>
+                                <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
+                                    Artikel Terbaru
+                                </h2>
+                                <p className="max-w-2xl text-lg text-muted-foreground">
+                                    Baca wawasan dan pengalaman dari para alumni
+                                </p>
+                            </div>
+                            <Link
+                                href="/articles"
+                                className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                            >
+                                Lihat Semua
+                                <Icon
+                                    iconNode={ArrowRight}
+                                    className="h-4 w-4"
+                                />
+                            </Link>
+                        </div>
+                        <div className="text-center">
+                            <Link
+                                href="/articles"
+                                className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                            >
+                                Jelajahi Artikel
+                                <Icon
+                                    iconNode={ArrowRight}
+                                    className="h-5 w-5"
+                                />
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Features Section */}
                 <section id="tentang" className="py-20 lg:py-32">
                     <div className="container mx-auto px-4 lg:px-8">
