@@ -121,9 +121,25 @@ class EventManagementController extends Controller
     public function registrations(Event $event): Response
     {
         $registrations = $event->registrations()
-            ->withPivot('status')
+            ->withPivot('status', 'created_at')
             ->orderBy('event_registrations.created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->pivot->id ?? $user->id,
+                    'user_id' => $user->id,
+                    'status' => $user->pivot->status,
+                    'registered_at' => $user->pivot->created_at,
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'angkatan' => $user->angkatan,
+                        'profesi' => $user->profesi,
+                        'profile_picture_url' => $user->profile_picture_url,
+                    ],
+                ];
+            });
 
         return Inertia::render('admin/events/registrations', [
             'event' => $event->load('creator:id,name'),

@@ -162,7 +162,9 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                     <CardContent>
                         <div className="mb-6 flex items-center space-x-4">
                             <Avatar className="h-20 w-20">
-                                <AvatarImage src={user_profile.profile_picture_url} />
+                                <AvatarImage
+                                    src={user_profile.profile_picture_url}
+                                />
                                 <AvatarFallback className="text-lg">
                                     {user_profile.name
                                         .split(' ')
@@ -173,8 +175,12 @@ export default function Dashboard({ dashboardData }: DashboardProps) {
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <h3 className="text-lg font-semibold">{user_profile.name}</h3>
-                                <p className="text-sm text-muted-foreground">{user_profile.email}</p>
+                                <h3 className="text-lg font-semibold">
+                                    {user_profile.name}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {user_profile.email}
+                                </p>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
