@@ -20,6 +20,7 @@ import {
     Calendar,
     FileText,
     Folder,
+    Home,
     LayoutGrid,
     MessageSquare,
     Tag,
@@ -47,6 +48,11 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = isAdmin
         ? [
               {
+                  title: 'Beranda',
+                  href: '/',
+                  icon: Home,
+              },
+              {
                   title: 'Dashboard',
                   href: '/admin/dashboard',
                   icon: LayoutGrid,
@@ -67,6 +73,11 @@ export function AppSidebar() {
                   icon: Tag,
               },
               {
+                  title: 'Kategori Forum',
+                  href: '/admin/forum/categories',
+                  icon: MessageSquare,
+              },
+              {
                   title: 'Forum Diskusi',
                   href: '/forum',
                   icon: MessageSquare,
@@ -78,6 +89,11 @@ export function AppSidebar() {
               },
           ]
         : [
+              {
+                  title: 'Beranda',
+                  href: '/',
+                  icon: Home,
+              },
               {
                   title: 'Dashboard',
                   href: dashboard(),

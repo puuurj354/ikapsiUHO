@@ -31,10 +31,9 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'IKAPSI UHO') }}</title>
 
         <link rel="icon" href="/150px-Logo-baru_UHO.png" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/150px-Logo-baru_UHO.png">
 
         <link rel="preconnect" href="https://fonts.bunny.net">

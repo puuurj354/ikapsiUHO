@@ -1,0 +1,56 @@
+node_modules/
+/vendor/
+npm-debug.log
+yarn-error.log
+
+# Laravel specific
+/bootstrap/cache/*
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+!/storage/framework/cache/.gitkeep
+!/storage/framework/sessions/.gitkeep
+!/storage/framework/views/.gitkeep
+
+# Environment files (will be handled separately)
+.env
+.env.backup
+.env.*.backup
+
+# Testing
+.phpunit.result.cache
+/coverage
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Test files
+tests/
+phpunit.xml
+.phpunit.cache
+
+# Development files
+docker-compose.override.yml
+.editorconfig
