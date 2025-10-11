@@ -20,6 +20,7 @@ import {
     Calendar,
     FileText,
     Folder,
+    Home,
     LayoutGrid,
     MessageSquare,
     Tag,
@@ -46,6 +47,11 @@ export function AppSidebar() {
 
     const mainNavItems: NavItem[] = isAdmin
         ? [
+              {
+                  title: 'Beranda',
+                  href: '/',
+                  icon: Home,
+              },
               {
                   title: 'Dashboard',
                   href: '/admin/dashboard',
@@ -78,6 +84,11 @@ export function AppSidebar() {
               },
           ]
         : [
+              {
+                  title: 'Beranda',
+                  href: '/',
+                  icon: Home,
+              },
               {
                   title: 'Dashboard',
                   href: dashboard(),
