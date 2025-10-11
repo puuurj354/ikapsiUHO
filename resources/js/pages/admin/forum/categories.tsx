@@ -1,3 +1,4 @@
+import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -15,7 +16,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Icon } from '@/components/icon';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -555,7 +555,10 @@ export default function ForumCategoriesIndex({ categories }: Props) {
                             >
                                 Batal
                             </Button>
-                            <Button type="submit" disabled={editForm.processing}>
+                            <Button
+                                type="submit"
+                                disabled={editForm.processing}
+                            >
                                 {editForm.processing
                                     ? 'Menyimpan...'
                                     : 'Perbarui'}
