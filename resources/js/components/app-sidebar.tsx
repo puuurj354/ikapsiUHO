@@ -73,6 +73,11 @@ export function AppSidebar() {
                   icon: Tag,
               },
               {
+                  title: 'Kategori Forum',
+                  href: '/admin/forum/categories',
+                  icon: MessageSquare,
+              },
+              {
                   title: 'Forum Diskusi',
                   href: '/forum',
                   icon: MessageSquare,

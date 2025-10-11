@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ArticleCategoryController;
 use App\Http\Controllers\Admin\EventManagementController as AdminEventController;
+use App\Http\Controllers\Admin\ForumCategoryController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AlumniDashboardController;
@@ -121,6 +122,14 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/', [ForumReportController::class, 'index'])->name('index');
         Route::patch('{report}', [ForumReportController::class, 'update'])->name('update');
         Route::delete('{report}', [ForumReportController::class, 'deleteReported'])->name('delete-content');
+    });
+
+    // Forum Category Management
+    Route::prefix('forum/categories')->name('forum.categories.')->group(function () {
+        Route::get('/', [ForumCategoryController::class, 'index'])->name('index');
+        Route::post('/', [ForumCategoryController::class, 'store'])->name('store');
+        Route::put('{category}', [ForumCategoryController::class, 'update'])->name('update');
+        Route::delete('{category}', [ForumCategoryController::class, 'destroy'])->name('destroy');
     });
 
     // Article Category Management
