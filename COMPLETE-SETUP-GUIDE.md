@@ -3,13 +3,15 @@
 ## Problem Summary
 
 **What was broken:**
+
 - Production had 500 errors because `public/build/` (frontend assets) were missing
 - Build tools (bun/node) not installed in production Docker
 - Local built with bun, production couldn't build
 - Environments were different, causing deployment issues
 
 **Root cause:**
-- `.gitignore` excluded `public/build/` 
+
+- `.gitignore` excluded `public/build/`
 - No build process in production
 - Docker didn't include build tools
 
@@ -22,6 +24,7 @@ We've adopted a **simple, reliable approach** used by many Laravel projects:
 ### ✅ Build assets locally → Commit to git → Deploy everywhere
 
 **Benefits:**
+
 1. ✅ **100% Environment Parity** - Same build files everywhere
 2. ✅ **Fast Deployments** - No build step needed (just `git pull`)
 3. ✅ **Reproducible** - Same exact assets every time
@@ -40,6 +43,7 @@ source ~/.bashrc  # or ~/.zshrc
 ```
 
 Verify installation:
+
 ```bash
 bun --version
 ```
@@ -75,6 +79,7 @@ git commit -m "feat: add pre-built assets for production parity"
 ```
 
 The script will:
+
 1. Build assets locally (automatically)
 2. Check for uncommitted changes
 3. Push to GitHub
@@ -159,6 +164,7 @@ git commit -m "fix: update user validation"
 ```
 
 **What happens:**
+
 - ✅ Quick deployment (~10 seconds)
 - ✅ No container rebuild
 - ✅ Just restarts the container
@@ -175,6 +181,7 @@ git commit -m "feat: new dashboard widget"
 ```
 
 **What happens:**
+
 - ✅ Deployment with new assets (~15 seconds)
 - ✅ No container rebuild (assets already in git)
 - ✅ Just restarts container
@@ -189,7 +196,8 @@ git commit -m "feat: add CategoryObserver"
 ```
 
 **What happens:**
-- ⚠️  Full container rebuild (~2-3 minutes)
+
+- ⚠️ Full container rebuild (~2-3 minutes)
 - ✅ Fresh PHP code loaded
 - ✅ Automatic cache clearing
 
@@ -203,6 +211,7 @@ git commit -m "feat: add posts table migration"
 ```
 
 **What happens:**
+
 - ✅ Runs `php artisan migrate --force`
 - ✅ Applies new schema changes
 - ✅ Quick deployment
@@ -214,11 +223,13 @@ git commit -m "feat: add posts table migration"
 ### Problem: Assets not loading after deployment
 
 **Symptoms:**
+
 - Blank page
 - Console errors: "Failed to load module"
 - 404 errors for `/build/assets/*`
 
 **Solution:**
+
 ```bash
 # Rebuild assets locally
 bun run build
@@ -234,11 +245,13 @@ git commit -m "chore: rebuild assets"
 ### Problem: Stale PHP code (Observer not working)
 
 **Symptoms:**
+
 - Observer events not firing
 - Provider changes not applied
 - Old behavior persists
 
 **Solution:**
+
 ```bash
 # Force container rebuild
 ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose down && docker-compose up -d --build"
@@ -247,10 +260,12 @@ ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose down && dock
 ### Problem: 500 Error after deployment
 
 **Symptoms:**
+
 - HTTP 500 on all pages
 - Error logs show cache issues
 
 **Solution:**
+
 ```bash
 # Clear all caches
 ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
@@ -261,10 +276,12 @@ ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
 ### Problem: Build fails locally
 
 **Symptoms:**
+
 - `bun run build` errors
 - Vite compilation errors
 
 **Solution:**
+
 ```bash
 # Clean install
 rm -rf node_modules
@@ -276,15 +293,15 @@ bun run build
 
 ## Environment Comparison
 
-| Aspect | Local | Production |
-|--------|-------|------------|
-| **OS** | Your machine | Ubuntu VPS |
-| **Database** | SQLite | MySQL 8.0 |
-| **Web Server** | `php artisan serve` | Apache (Docker) |
-| **PHP** | Your version | 8.3 (Docker) |
-| **Assets** | `public/build/` (committed) | `public/build/` (from git) |
-| **Build Tool** | Bun (installed) | Not needed (uses committed files) |
-| **Caching** | File cache | Database cache |
+| Aspect         | Local                       | Production                        |
+| -------------- | --------------------------- | --------------------------------- |
+| **OS**         | Your machine                | Ubuntu VPS                        |
+| **Database**   | SQLite                      | MySQL 8.0                         |
+| **Web Server** | `php artisan serve`         | Apache (Docker)                   |
+| **PHP**        | Your version                | 8.3 (Docker)                      |
+| **Assets**     | `public/build/` (committed) | `public/build/` (from git)        |
+| **Build Tool** | Bun (installed)             | Not needed (uses committed files) |
+| **Caching**    | File cache                  | Database cache                    |
 
 **Key Point:** Assets are built ONCE (locally), used EVERYWHERE (committed to git).
 
@@ -302,6 +319,7 @@ COPY --from=builder /app/build ./build
 ```
 
 **Problems:**
+
 - Slow builds (5-10 minutes)
 - Complex Dockerfile
 - Requires PHP in builder stage for Wayfinder
@@ -314,6 +332,7 @@ ssh prod "cd app && npm install && npm run build"
 ```
 
 **Problems:**
+
 - Requires Node.js/Bun on production server
 - Extra dependencies to maintain
 - Slower deployments
@@ -327,6 +346,7 @@ ssh prod "cd app && npm install && npm run build"
 ```
 
 **Benefits:**
+
 - ✅ Fast deployments
 - ✅ Simple setup
 - ✅ Reproducible builds
@@ -370,12 +390,14 @@ curl https://ikapsi.horus.my.id/build/manifest.json
 ### Build Files in Git - Is This Safe?
 
 **Yes!** Build files contain:
+
 - ✅ Minified JavaScript (already obfuscated)
 - ✅ Compiled CSS
 - ✅ No secrets or API keys
 - ✅ Public assets meant to be served to browsers
 
 **What we DON'T commit:**
+
 - ❌ `.env` files (gitignored)
 - ❌ `vendor/` directory (gitignored)
 - ❌ `node_modules/` (gitignored)
@@ -406,16 +428,16 @@ After deployment:
 
 ## Quick Commands Reference
 
-| Task | Command |
-|------|---------|
-| Build assets | `bun run build` |
-| Deploy to production | `./deploy-production.sh` |
-| Rollback | `./rollback-production.sh` |
-| View logs | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose logs -f"` |
-| Clear caches | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan optimize:clear"` |
-| Rebuild containers | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose up -d --build"` |
-| Run migrations | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan migrate"` |
-| Run tinker | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan tinker"` |
+| Task                 | Command                                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Build assets         | `bun run build`                                                                                                      |
+| Deploy to production | `./deploy-production.sh`                                                                                             |
+| Rollback             | `./rollback-production.sh`                                                                                           |
+| View logs            | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose logs -f"`                                       |
+| Clear caches         | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan optimize:clear"` |
+| Rebuild containers   | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose up -d --build"`                                 |
+| Run migrations       | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan migrate"`        |
+| Run tinker           | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan tinker"`         |
 
 ---
 

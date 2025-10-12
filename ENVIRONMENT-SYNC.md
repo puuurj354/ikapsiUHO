@@ -7,6 +7,7 @@ This guide ensures your **local** and **production** environments are **100% ide
 ## Architecture: Identical Environments
 
 Both local and production now use:
+
 - ✅ **Same Dockerfile** with multi-stage build
 - ✅ **Frontend assets built during Docker image creation**
 - ✅ **No manual build steps required**
@@ -44,9 +45,9 @@ When you run `./deploy-production.sh`:
 1. **Push to GitHub** - Your code is versioned
 2. **Pull on Production** - Latest code downloaded
 3. **Smart Rebuild Detection**:
-   - Frontend code changed? → Full rebuild (includes asset compilation)
-   - Provider/Observer changed? → Full rebuild
-   - Only PHP code changed? → No rebuild needed
+    - Frontend code changed? → Full rebuild (includes asset compilation)
+    - Provider/Observer changed? → Full rebuild
+    - Only PHP code changed? → No rebuild needed
 4. **Run Migrations** - Database updates
 5. **Clear Caches** - Prevent stale cache issues
 6. **Health Check** - Verify deployment success
@@ -56,6 +57,7 @@ When you run `./deploy-production.sh`:
 ## The Problem We Solved
 
 ### Before (Broken):
+
 ```
 Local:                          Production:
 ├── bun installed ✅            ├── No bun ❌
@@ -65,6 +67,7 @@ Local:                          Production:
 ```
 
 ### After (Fixed):
+
 ```
 Local:                          Production:
 ├── Docker builds assets ✅     ├── Docker builds assets ✅
@@ -124,6 +127,7 @@ git commit -m "Your changes"
 ```
 
 The script automatically:
+
 - ✅ Detects what changed
 - ✅ Rebuilds only if needed
 - ✅ Runs migrations
@@ -133,12 +137,14 @@ The script automatically:
 ### When Does It Rebuild?
 
 **Full Rebuild Required** (takes ~2-3 minutes):
+
 - ✅ Frontend code changed (`resources/js/**`, `vite.config.ts`)
 - ✅ Dependencies changed (`package.json`, `bun.lockb`)
 - ✅ Providers/Observers changed (`app/Providers/**`, `app/Observers/**`)
 - ✅ Dockerfile changed
 
 **Quick Restart** (takes ~5 seconds):
+
 - ✅ Only PHP code changed (Controllers, Models, Services)
 - ✅ Routes changed
 - ✅ Views changed
@@ -180,6 +186,7 @@ fi
 **Cause**: Stale Laravel caches or missing assets
 
 **Solution**:
+
 ```bash
 ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
   docker-compose exec -T ikapsi-app php artisan cache:clear && \
@@ -192,6 +199,7 @@ ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
 **Cause**: Container not rebuilt after Provider changes
 
 **Solution**: Force rebuild
+
 ```bash
 ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
   docker-compose down && \
@@ -203,6 +211,7 @@ ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
 **Cause**: Assets not rebuilt
 
 **Solution**: Force rebuild
+
 ```bash
 ./deploy-production.sh
 # (It will automatically detect frontend changes and rebuild)
@@ -213,6 +222,7 @@ ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
 ## Environment Variables
 
 ### Local (.env)
+
 ```env
 APP_ENV=local
 APP_DEBUG=true
@@ -220,6 +230,7 @@ DB_CONNECTION=sqlite
 ```
 
 ### Production (.env)
+
 ```env
 APP_ENV=production
 APP_DEBUG=false
@@ -252,14 +263,14 @@ After deployment, verify:
 
 ## Quick Reference
 
-| Task | Command |
-|------|---------|
-| Deploy to production | `./deploy-production.sh` |
-| Rollback deployment | `./rollback-production.sh` |
-| View production logs | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose logs -f ikapsi-app"` |
-| Rebuild containers | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose up -d --build"` |
-| Run migrations | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan migrate"` |
-| Clear all caches | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan optimize:clear"` |
+| Task                 | Command                                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Deploy to production | `./deploy-production.sh`                                                                                             |
+| Rollback deployment  | `./rollback-production.sh`                                                                                           |
+| View production logs | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose logs -f ikapsi-app"`                            |
+| Rebuild containers   | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose up -d --build"`                                 |
+| Run migrations       | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan migrate"`        |
+| Clear all caches     | `ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose exec -T ikapsi-app php artisan optimize:clear"` |
 
 ---
 
@@ -278,27 +289,30 @@ After deployment, verify:
 ## Next Steps
 
 1. Commit the new Dockerfile and deployment script:
-   ```bash
-   git add Dockerfile deploy-production.sh .gitignore
-   git commit -m "feat: implement multi-stage Docker build for identical environments"
-   ```
+
+    ```bash
+    git add Dockerfile deploy-production.sh .gitignore
+    git commit -m "feat: implement multi-stage Docker build for identical environments"
+    ```
 
 2. Deploy to production:
-   ```bash
-   ./deploy-production.sh
-   ```
+
+    ```bash
+    ./deploy-production.sh
+    ```
 
 3. Verify everything works:
-   ```bash
-   curl -I https://ikapsi.horus.my.id
-   ```
+
+    ```bash
+    curl -I https://ikapsi.horus.my.id
+    ```
 
 4. Test forum category creation:
-   ```bash
-   ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
-     docker-compose exec -T ikapsi-app php artisan tinker \
-     --execute='App\Models\ForumCategory::create([\"name\" => \"Test Category\"]);'"
-   ```
+    ```bash
+    ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && \
+      docker-compose exec -T ikapsi-app php artisan tinker \
+      --execute='App\Models\ForumCategory::create([\"name\" => \"Test Category\"]);'"
+    ```
 
 ---
 

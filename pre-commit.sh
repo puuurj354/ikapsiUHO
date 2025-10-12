@@ -9,9 +9,9 @@ FRONTEND_CHANGED=$(git diff --cached --name-only | grep -c "resources/js\|vite.c
 
 if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     echo "📦 Frontend files changed, rebuilding assets..."
-    
+
     bun run build
-    
+
     if [ $? -eq 0 ]; then
         echo "✅ Assets built successfully"
         # Add build files to commit

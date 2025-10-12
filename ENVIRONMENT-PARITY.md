@@ -57,12 +57,12 @@ git commit -m "feat: your changes"
 
 ## What's Different Now?
 
-| Before | After |
-|--------|-------|
+| Before                        | After                        |
+| ----------------------------- | ---------------------------- |
 | ❌ `public/build/` gitignored | ✅ `public/build/` committed |
-| ❌ Manual asset copying | ✅ Automatic via git |
-| ❌ 500 errors in production | ✅ Always works |
-| ❌ Different environments | ✅ 100% identical |
+| ❌ Manual asset copying       | ✅ Automatic via git         |
+| ❌ 500 errors in production   | ✅ Always works              |
+| ❌ Different environments     | ✅ 100% identical            |
 
 ---
 
@@ -128,7 +128,7 @@ curl -I https://ikapsi.horus.my.id
 ✅ **Reliable** - Same assets every time  
 ✅ **Simple** - No complex Docker builds  
 ✅ **Safe** - Automatic health checks  
-✅ **Reproducible** - Committed to git  
+✅ **Reproducible** - Committed to git
 
 ---
 
