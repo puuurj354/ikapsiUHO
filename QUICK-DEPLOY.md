@@ -3,6 +3,7 @@
 ## Your Daily Workflow (Super Simple!)
 
 ### 1️⃣ Work on Your Code
+
 ```bash
 # Start development server
 composer run dev
@@ -12,17 +13,20 @@ composer run dev
 ```
 
 ### 2️⃣ Commit Your Changes
+
 ```bash
 git add .
 git commit -m "your message here"
 ```
 
 ### 3️⃣ Deploy to Production
+
 ```bash
 ./deploy-production.sh
 ```
 
 **That's it!** ✅ The script does everything automatically:
+
 - ✅ Pushes to GitHub
 - ✅ Pulls on server
 - ✅ Installs dependencies (if needed)
@@ -37,6 +41,7 @@ git commit -m "your message here"
 ## 🆘 If Something Goes Wrong
 
 ### Emergency Rollback
+
 ```bash
 ./rollback-production.sh
 ```
@@ -48,11 +53,13 @@ This will instantly rollback to the previous working version!
 ## ✅ What Changed?
 
 **Old Process** (what caused the 502 error):
+
 - Used `php artisan optimize:clear` (doesn't clear everything)
 - Didn't verify deployment success
 - No rollback option
 
 **New Process** (safer):
+
 - Clears **ALL** caches individually (cache, config, route, view)
 - Rebuilds caches from scratch
 - Checks if deployment worked
@@ -71,6 +78,7 @@ The old script used `optimize:clear` which sometimes leaves **stale cache files*
 ## 📚 More Details
 
 See `DEPLOYMENT-GUIDE.md` for:
+
 - Manual deployment steps
 - Troubleshooting common issues
 - Monitoring commands

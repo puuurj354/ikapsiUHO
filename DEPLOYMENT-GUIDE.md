@@ -3,6 +3,7 @@
 ## 📋 Deployment Workflow (Safe & Simple)
 
 ### **Step 1: Make Changes Locally**
+
 ```bash
 # Work on your code
 # Test everything locally first!
@@ -10,6 +11,7 @@ composer run dev
 ```
 
 ### **Step 2: Commit Your Changes**
+
 ```bash
 # Stage your changes
 git add .
@@ -21,6 +23,7 @@ git commit -m "fix: resolve bug in forum"
 ```
 
 ### **Step 3: Deploy to Production**
+
 ```bash
 # This will automatically:
 # 1. Push to GitHub
@@ -59,17 +62,20 @@ If something goes wrong after deployment:
 If you need to deploy manually or troubleshoot:
 
 ### **Connect to Production Server**
+
 ```bash
 ssh admin@147.93.81.147
 cd ~/Documents/ikapsiUHO
 ```
 
 ### **Pull Latest Changes**
+
 ```bash
 git pull origin main
 ```
 
 ### **Update Dependencies** (only if composer.lock or package.json changed)
+
 ```bash
 # PHP dependencies
 docker-compose exec -T ikapsi-app composer install --no-dev --optimize-autoloader
@@ -79,11 +85,13 @@ docker-compose exec -T ikapsi-app bash -c 'export BUN_INSTALL="$HOME/.bun" && ex
 ```
 
 ### **Run Migrations**
+
 ```bash
 docker-compose exec -T ikapsi-app php artisan migrate --force
 ```
 
 ### **Clear & Rebuild Caches** (IMPORTANT!)
+
 ```bash
 # Clear everything first
 docker-compose exec -T ikapsi-app php artisan cache:clear
@@ -98,11 +106,13 @@ docker-compose exec -T ikapsi-app php artisan view:cache
 ```
 
 ### **Restart Application**
+
 ```bash
 docker-compose restart ikapsi-app
 ```
 
 ### **Verify Deployment**
+
 ```bash
 # Check container status
 docker-compose ps
@@ -122,6 +132,7 @@ curl -I https://ikapsi.horus.my.id
 ## 🔍 Troubleshooting
 
 ### **502 Bad Gateway**
+
 ```bash
 # Clear all caches
 docker-compose exec -T ikapsi-app php artisan cache:clear
@@ -138,6 +149,7 @@ docker-compose restart ikapsi-app
 ```
 
 ### **500 Internal Server Error**
+
 ```bash
 # Check logs
 docker-compose logs --tail=100 ikapsi-app
@@ -149,6 +161,7 @@ docker-compose exec -T ikapsi-app chmod -R 775 storage bootstrap/cache
 ```
 
 ### **Database Issues**
+
 ```bash
 # Check database connection
 docker-compose exec -T ikapsi-app php artisan tinker --execute="DB::connection()->getPdo();"
@@ -164,6 +177,7 @@ docker-compose exec -T ikapsi-app php artisan migrate
 ```
 
 ### **Container Won't Start**
+
 ```bash
 # Check container logs
 docker-compose logs ikapsi-app
@@ -182,21 +196,25 @@ docker-compose ps
 ## 📊 Monitoring
 
 ### **Check Application Status**
+
 ```bash
 ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose ps"
 ```
 
 ### **View Live Logs**
+
 ```bash
 ssh admin@147.93.81.147 "cd ~/Documents/ikapsiUHO && docker-compose logs -f ikapsi-app"
 ```
 
 ### **Check Disk Space**
+
 ```bash
 ssh admin@147.93.81.147 "df -h"
 ```
 
 ### **Check Memory Usage**
+
 ```bash
 ssh admin@147.93.81.147 "free -h"
 ```
@@ -205,16 +223,16 @@ ssh admin@147.93.81.147 "free -h"
 
 ## ⚡ Quick Commands Reference
 
-| Command | Description |
-|---------|-------------|
-| `./deploy-production.sh` | Deploy to production |
-| `./rollback-production.sh` | Rollback to previous version |
-| `ssh admin@147.93.81.147` | Connect to server |
-| `docker-compose ps` | Check containers status |
-| `docker-compose logs -f ikapsi-app` | View live logs |
-| `docker-compose restart ikapsi-app` | Restart app |
-| `docker-compose down` | Stop all containers |
-| `docker-compose up -d` | Start all containers |
+| Command                             | Description                  |
+| ----------------------------------- | ---------------------------- |
+| `./deploy-production.sh`            | Deploy to production         |
+| `./rollback-production.sh`          | Rollback to previous version |
+| `ssh admin@147.93.81.147`           | Connect to server            |
+| `docker-compose ps`                 | Check containers status      |
+| `docker-compose logs -f ikapsi-app` | View live logs               |
+| `docker-compose restart ikapsi-app` | Restart app                  |
+| `docker-compose down`               | Stop all containers          |
+| `docker-compose up -d`              | Start all containers         |
 
 ---
 
