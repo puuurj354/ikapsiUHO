@@ -98,6 +98,9 @@ fi
 echo "  → Running migrations..."
 docker-compose exec -T ikapsi-app php artisan migrate --force
 
+echo "  → Generating Wayfinder routes..."
+docker-compose exec -T ikapsi-app php artisan wayfinder:generate
+
 echo "  → Clearing all caches (preventing stale cache issues)..."
 docker-compose exec -T ikapsi-app php artisan cache:clear
 docker-compose exec -T ikapsi-app php artisan config:clear

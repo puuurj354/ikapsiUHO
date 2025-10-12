@@ -89,6 +89,10 @@ class EventManagementController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
+        // Check if event is being published for the first time
+        $wasUnpublished = !$event->is_published;
+        $willBePublished = $validated['is_published'] ?? false;
+
         if ($request->hasFile('image')) {
             if ($event->image) {
                 Storage::disk('public')->delete($event->image);
@@ -97,6 +101,15 @@ class EventManagementController extends Controller
         }
 
         $event->update($validated);
+
+        // Notify all users if event is newly published
+        if ($wasUnpublished && $willBePublished) {
+            $users = \App\Models\User::where('is_admin', false)->get();
+            \Illuminate\Support\Facades\Notification::send(
+                $users,
+                new \App\Notifications\NewEventPublishedNotification($event)
+            );
+        }
 
         return back()->with('success', 'Event berhasil diperbarui.');
     }
@@ -159,6 +172,15 @@ class EventManagementController extends Controller
         $event->registrations()->updateExistingPivot($userId, [
             'status' => $validated['status'],
         ]);
+
+        // Send notification to user
+        $user = \App\Models\User::find($userId);
+        if ($user) {
+            $user->notify(new \App\Notifications\EventRegistrationStatusChangedNotification(
+                $event,
+                $validated['status']
+            ));
+        }
 
         return back()->with('success', 'Status pendaftaran berhasil diperbarui.');
     }

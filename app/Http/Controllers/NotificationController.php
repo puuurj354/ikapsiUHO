@@ -21,15 +21,25 @@ class NotificationController extends Controller
 
     public function getUnread(Request $request)
     {
-        $notifications = $request->user()
-            ->unreadNotifications()
-            ->latest()
-            ->limit(10)
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+
+        $query = $request->user()->unreadNotifications()->latest();
+
+        $total = $query->count();
+        $notifications = $query
+            ->skip(($page - 1) * $perPage)
+            ->take($perPage)
             ->get();
+
+        $hasMore = ($page * $perPage) < $total;
 
         return response()->json([
             'notifications' => $notifications,
-            'unread_count' => $request->user()->unreadNotifications()->count(),
+            'unread_count' => $total,
+            'has_more' => $hasMore,
+            'current_page' => $page,
+            'per_page' => $perPage,
         ]);
     }
 
@@ -74,9 +84,6 @@ class NotificationController extends Controller
     {
         $request->user()->notifications()->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Semua notifikasi berhasil dihapus',
-        ]);
+        return back()->with('success', 'Semua notifikasi berhasil dihapus');
     }
 }

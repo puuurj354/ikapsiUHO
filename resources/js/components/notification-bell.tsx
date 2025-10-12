@@ -10,6 +10,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { router } from '@inertiajs/react';
 import {
     Bell,
+    BellRing,
+    Calendar,
+    CalendarCheck,
+    CalendarCheck2,
+    CalendarPlus,
+    CalendarX,
     Check,
     Heart,
     Loader2,
@@ -39,9 +45,15 @@ interface NotificationBellProps {
 }
 
 const iconMap: Record<string, LucideIcon> = {
-    MessageSquare,
-    Heart,
-    Sparkles,
+    'message-square': MessageSquare,
+    heart: Heart,
+    sparkles: Sparkles,
+    'calendar-check': CalendarCheck,
+    'calendar-check-2': CalendarCheck2,
+    'calendar-x': CalendarX,
+    'calendar-plus': CalendarPlus,
+    'bell-ring': BellRing,
+    calendar: Calendar,
 };
 
 export function NotificationBell({ className }: NotificationBellProps) {
@@ -49,21 +61,38 @@ export function NotificationBell({ className }: NotificationBellProps) {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [hasMore, setHasMore] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 10;
 
-    const fetchNotifications = async () => {
+    const fetchNotifications = async (page = 1) => {
         try {
             setIsLoading(true);
-            const response = await fetch('/notifications/unread');
+            const response = await fetch(
+                `/notifications/unread?page=${page}&per_page=${ITEMS_PER_PAGE}`,
+            );
             if (!response.ok) {
                 throw new Error('Failed to fetch notifications');
             }
             const data = await response.json();
-            setNotifications(data.notifications || []);
+
+            if (page === 1) {
+                setNotifications(data.notifications || []);
+            } else {
+                setNotifications((prev) => [
+                    ...prev,
+                    ...(data.notifications || []),
+                ]);
+            }
+
             setUnreadCount(data.unread_count || 0);
+            setHasMore(data.has_more || false);
+            setCurrentPage(page);
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
             setNotifications([]);
             setUnreadCount(0);
+            setHasMore(false);
         } finally {
             setIsLoading(false);
         }
@@ -314,6 +343,22 @@ export function NotificationBell({ className }: NotificationBellProps) {
                                     </DropdownMenuItem>
                                 );
                             })}
+                        </div>
+                    )}
+
+                    {/* Load More Button */}
+                    {hasMore && !isLoading && (
+                        <div className="p-2 pt-0">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full text-xs"
+                                onClick={() =>
+                                    fetchNotifications(currentPage + 1)
+                                }
+                            >
+                                Muat Lebih Banyak
+                            </Button>
                         </div>
                     )}
                 </ScrollArea>

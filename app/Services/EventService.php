@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Notifications\EventRegistrationConfirmedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -57,6 +58,9 @@ class EventService
             $event->registrations()->attach($user->id, [
                 'status' => 'registered',
             ]);
+
+            // Send confirmation notification
+            $user->notify(new EventRegistrationConfirmedNotification($event));
 
             // Log the registration
             Log::info('User registered for event', [
