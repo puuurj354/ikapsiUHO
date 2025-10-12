@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\ForumCategory;
+use App\Observers\ForumCategoryObserver;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,5 +26,8 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production' || config('app.force_https')) {
             URL::forceScheme('https');
         }
+
+        // Register model observers
+        ForumCategory::observe(ForumCategoryObserver::class);
     }
 }

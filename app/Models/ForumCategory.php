@@ -26,46 +26,6 @@ class ForumCategory extends Model
     ];
 
     /**
-     * Boot the model
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
-
-                // Ensure slug is unique by appending number if needed
-                $originalSlug = $category->slug;
-                $counter = 1;
-
-                while (static::where('slug', $category->slug)->exists()) {
-                    $category->slug = $originalSlug . '-' . $counter;
-                    $counter++;
-                }
-            }
-        });
-
-        static::updating(function ($category) {
-            if ($category->isDirty('name') && empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
-
-                // Ensure slug is unique by appending number if needed
-                $originalSlug = $category->slug;
-                $counter = 1;
-
-                while (static::where('slug', $category->slug)
-                    ->where('id', '!=', $category->id)
-                    ->exists()) {
-                    $category->slug = $originalSlug . '-' . $counter;
-                    $counter++;
-                }
-            }
-        });
-    }
-
-    /**
      * Get the discussions for the category.
      */
     public function discussions(): HasMany
