@@ -11,11 +11,13 @@
 ## 🔐 Credentials
 
 ### Admin User
+
 - **Email:** `admin@ikapsiuho.id`
 - **Password:** `password`
 - ⚠️ **IMPORTANT:** Ganti password setelah login pertama!
 
 ### VPS SSH
+
 - **Host:** `147.93.81.147`
 - **User:** `admin`
 - **Directory:** `~/Documents/ikapsiUHO`
@@ -25,6 +27,7 @@
 ## 📋 Deployment Architecture
 
 ### Tech Stack
+
 - **Backend:** Laravel 12 + PHP 8.3
 - **Frontend:** React 19 + TypeScript + Inertia.js
 - **Styling:** Tailwind CSS v4 + shadcn/ui
@@ -34,6 +37,7 @@
 - **Container:** Docker + Docker Compose
 
 ### Project Structure (VPS)
+
 ```
 /home/admin/Documents/ikapsiUHO/
 ├── .env                    # Production environment config
@@ -53,6 +57,7 @@
 ## 🚀 Cara Deploy Perubahan
 
 ### Method 1: Using Deployment Script (Recommended)
+
 ```bash
 # Dari komputer lokal
 cd /home/purnama/Documents/ikapsiUHO
@@ -60,6 +65,7 @@ cd /home/purnama/Documents/ikapsiUHO
 ```
 
 Script otomatis akan:
+
 1. Push perubahan ke GitHub
 2. SSH ke VPS dan pull latest code
 3. Install dependencies jika ada perubahan
@@ -69,6 +75,7 @@ Script otomatis akan:
 7. Restart container
 
 ### Method 2: Manual Deployment
+
 ```bash
 # 1. Push ke GitHub
 git push origin main
@@ -102,6 +109,7 @@ docker-compose exec -T ikapsi-app php artisan route:cache
 ## 🛠️ Common Commands
 
 ### Container Management
+
 ```bash
 # Check status
 docker-compose ps
@@ -120,6 +128,7 @@ docker-compose up -d
 ```
 
 ### Laravel Artisan
+
 ```bash
 # Run migrations
 docker-compose exec -T ikapsi-app php artisan migrate --force
@@ -135,6 +144,7 @@ docker-compose exec -T ikapsi-app php artisan key:generate --show
 ```
 
 ### Database
+
 ```bash
 # Access MySQL
 docker-compose exec ikapsi-db mysql -u ikapsi_user -p ikapsi_db
@@ -152,6 +162,7 @@ docker-compose exec -T ikapsi-db mysql -u ikapsi_user -piKapsi2025SecurePass! ik
 ## 🔧 Troubleshooting
 
 ### Website Menampilkan 500 Error
+
 ```bash
 # Check logs
 docker-compose logs --tail=50 ikapsi-app
@@ -165,6 +176,7 @@ docker-compose restart ikapsi-app
 ```
 
 ### Frontend Assets Tidak Load
+
 ```bash
 # Rebuild frontend
 docker-compose exec -T ikapsi-app bash -c 'export BUN_INSTALL="$HOME/.bun" && export PATH="$BUN_INSTALL/bin:$PATH" && bun run build'
@@ -174,6 +186,7 @@ docker-compose exec ikapsi-app ls -lh public/build/
 ```
 
 ### Database Connection Error
+
 ```bash
 # Check database container
 docker-compose ps ikapsi-db
@@ -183,6 +196,7 @@ docker-compose exec ikapsi-app mysql --skip-ssl -h ikapsi-db -u ikapsi_user -p -
 ```
 
 ### Permission Issues
+
 ```bash
 # Fix storage permissions
 docker-compose exec ikapsi-app chown -R www-data:www-data storage bootstrap/cache
@@ -194,22 +208,26 @@ docker-compose exec ikapsi-app chmod -R 775 storage bootstrap/cache
 ## 📝 Important Notes
 
 ### Environment Variables
+
 - `.env` di VPS sudah dikonfigurasi untuk production
 - `APP_KEY` sudah di-generate
 - Database credentials di docker-compose.yml
 - Asset URL: `https://ikapsi.horus.my.id`
 
 ### Docker Configuration
+
 - `.dockerignore` sudah di-edit untuk ALLOW `.env` file
 - `docker-entrypoint.sh` skip key generate jika APP_KEY sudah ada
 - Bun.sh di-install di dalam container saat build frontend
 
 ### Storage Directory
+
 - File di `storage/` owned by `www-data` (Docker container user)
 - TIDAK di-track oleh Git (kecuali `.gitignore` placeholders)
 - Di-persist via Docker volumes
 
 ### Seeders
+
 - Hanya `AdminUserSeeder` yang dijalankan di production
 - Seeder lain (artikel, event, forum) TIDAK dijalankan
 
@@ -218,6 +236,7 @@ docker-compose exec ikapsi-app chmod -R 775 storage bootstrap/cache
 ## 🎯 Next Steps
 
 ### Security
+
 1. ✅ Ganti password admin default
 2. ✅ Setup backup rutin database
 3. ✅ Monitor logs secara berkala
@@ -225,12 +244,14 @@ docker-compose exec ikapsi-app chmod -R 775 storage bootstrap/cache
 5. ⚠️ Enable rate limiting untuk API
 
 ### Performance
+
 1. ✅ Frontend assets sudah di-build dan optimized
 2. ✅ Laravel cache sudah enabled (config, routes, views)
 3. ⚠️ Consider Redis untuk session & cache (optional)
 4. ⚠️ Setup CDN untuk static assets (optional)
 
 ### Development
+
 1. ✅ Git workflow sudah setup
 2. ✅ Deployment script sudah ready
 3. ⚠️ Setup staging environment (optional)
@@ -244,10 +265,10 @@ docker-compose exec ikapsi-app chmod -R 775 storage bootstrap/cache
 - **Domain:** ikapsi.horus.my.id
 - **GitHub Repo:** <https://github.com/puuurj354/ikapsiUHO>
 - **Docker Containers:**
-  - `ikapsi-app` (Laravel + Apache + PHP 8.3)
-  - `ikapsi-db` (MySQL 8.0)
+    - `ikapsi-app` (Laravel + Apache + PHP 8.3)
+    - `ikapsi-db` (MySQL 8.0)
 - **Nginx Proxy Manager:** <http://147.93.81.147:81>
-  - Default admin: `admin@example.com` / `changeme`
+    - Default admin: `admin@example.com` / `changeme`
 
 ---
 
@@ -261,6 +282,6 @@ docker-compose exec ikapsi-app chmod -R 775 storage bootstrap/cache
 ✅ **Admin Seeded:** User admin sudah ready  
 ✅ **Frontend Built:** Assets compiled dan optimized  
 ✅ **HTTPS Enabled:** SSL certificate via Let's Encrypt  
-✅ **Health Checks:** Container monitoring active  
+✅ **Health Checks:** Container monitoring active
 
 🎉 **Website Status:** FULLY OPERATIONAL!

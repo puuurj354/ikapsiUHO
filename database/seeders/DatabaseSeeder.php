@@ -17,32 +17,32 @@ class DatabaseSeeder extends Seeder
         // Seed admin user
         $this->call(AdminUserSeeder::class);
 
-        // Seed test alumni data
-        $this->call(AlumniTestSeeder::class);
+        // // Seed test alumni data
+        // $this->call(AlumniTestSeeder::class);
 
-        // Seed events
-        $this->call(EventSeeder::class);
+        // // Seed events
+        // $this->call(EventSeeder::class);
 
-        // Seed forum categories
-        $this->call(ForumCategorySeeder::class);
+        // // Seed forum categories
+        // $this->call(ForumCategorySeeder::class);
 
-        // Seed forum discussions
-        $this->call(ForumDiscussionSeeder::class);
+        // // Seed forum discussions
+        // $this->call(ForumDiscussionSeeder::class);
 
-        // Seed forum reports
-        $this->call(ForumReportSeeder::class);
+        // // Seed forum reports
+        // $this->call(ForumReportSeeder::class);
 
-        // Seed article categories
-        $this->call(ArticleCategorySeeder::class);
+        // // Seed article categories
+        // $this->call(ArticleCategorySeeder::class);
 
-        // Create additional test user if needed
-        User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            [
-                'name' => 'Test User',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
+        // // Create additional test user if needed
+        // User::firstOrCreate(
+        //     ['email' => 'test@example.com'],
+        //     [
+        //         'name' => 'Test User',
+        //         'password' => Hash::make('password'),
+        //         'email_verified_at' => now(),
+        //     ]
+        // );
     }
 }
