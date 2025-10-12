@@ -78,10 +78,21 @@ docker-compose exec -T ikapsi-app php artisan view:cache
 
 echo "  → Gracefully restarting application..."
 docker-compose exec -T ikapsi-app php artisan queue:restart 2>/dev/null || true
-docker-compose restart ikapsi-app
 
-echo "  → Waiting for application to be healthy..."
-sleep 5
+# Check if critical files changed that require container rebuild
+CODE_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "app/Providers\|app/Observers\|Dockerfile\|docker-compose.yml\|docker-entrypoint.sh" || true)
+
+if [ "$CODE_CHANGED" -gt 0 ]; then
+    echo "  → Critical code changes detected, rebuilding container..."
+    docker-compose down
+    docker-compose up -d --build
+    echo "  → Waiting for container to be ready..."
+    sleep 10
+else
+    echo "  → Restarting container..."
+    docker-compose restart ikapsi-app
+    sleep 5
+fi
 
 # Health check
 echo "  → Running health check..."
