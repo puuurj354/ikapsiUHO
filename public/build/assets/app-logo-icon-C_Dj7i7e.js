@@ -1,1 +1,0 @@
-import{j as a}from"./app-K8gLvUNf.js";function n(o){return a.jsx("img",{...o,src:"/150px-Logo-baru_UHO.png",alt:"Logo Ikatan Alumni Psikologi Universitas Halu Oleo",className:`${o.className||""} object-contain`})}export{n as A};

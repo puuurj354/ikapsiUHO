@@ -11,15 +11,15 @@ import AuthLayout from '@/layouts/auth-layout';
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
         <AuthLayout
-            title="Verify email"
-            description="Please verify your email address by clicking on the link we just emailed to you."
+            title="Verifikasi Email"
+            description="Silakan verifikasi alamat email Anda dengan mengklik tautan yang baru saja kami kirimkan."
         >
-            <Head title="Email verification" />
+            <Head title="Verifikasi Email" />
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                    Tautan verifikasi baru telah dikirim ke alamat email yang
+                    Anda berikan saat pendaftaran.
                 </div>
             )}
 
@@ -33,14 +33,14 @@ export default function VerifyEmail({ status }: { status?: string }) {
                             {processing && (
                                 <LoaderCircle className="h-4 w-4 animate-spin" />
                             )}
-                            Resend verification email
+                            Kirim Ulang Email Verifikasi
                         </Button>
 
                         <TextLink
                             href={logout()}
                             className="mx-auto block text-sm"
                         >
-                            Log out
+                            Keluar
                         </TextLink>
                     </>
                 )}

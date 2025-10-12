@@ -11,6 +11,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
@@ -23,6 +31,12 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: edit().url,
     },
 ];
+
+// Generate year options (2000 - current year + 1)
+const currentYear = new Date().getFullYear();
+const graduationYears = Array.from({ length: currentYear - 1999 + 1 }, (_, i) =>
+    (2000 + i).toString(),
+);
 
 export default function Profile({
     mustVerifyEmail,
@@ -38,6 +52,9 @@ export default function Profile({
         useForm({
             name: auth.user.name,
             email: auth.user.email,
+            angkatan: auth.user.angkatan || '',
+            profesi: auth.user.profesi || '',
+            bio: auth.user.bio || '',
             profile_picture: null as File | null,
             _method: 'PATCH',
         });
@@ -201,6 +218,81 @@ export default function Profile({
                                 className="mt-2"
                                 message={errors.email}
                             />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="angkatan">
+                                Tahun Lulus (Angkatan)
+                            </Label>
+
+                            <Select
+                                name="angkatan"
+                                value={
+                                    typeof data.angkatan === 'string'
+                                        ? data.angkatan
+                                        : ''
+                                }
+                                onValueChange={(value) =>
+                                    setData('angkatan', value)
+                                }
+                            >
+                                <SelectTrigger id="angkatan">
+                                    <SelectValue placeholder="Pilih tahun lulus" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {graduationYears.reverse().map((year) => (
+                                        <SelectItem key={year} value={year}>
+                                            {year}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <InputError
+                                className="mt-2"
+                                message={errors.angkatan}
+                            />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="profesi">Profesi</Label>
+
+                            <Input
+                                id="profesi"
+                                className="mt-1 block w-full"
+                                value={
+                                    typeof data.profesi === 'string'
+                                        ? data.profesi
+                                        : ''
+                                }
+                                onChange={(e) =>
+                                    setData('profesi', e.target.value)
+                                }
+                                autoComplete="organization-title"
+                                placeholder="Psikolog, Konselor, dll"
+                            />
+
+                            <InputError
+                                className="mt-2"
+                                message={errors.profesi}
+                            />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="bio">Bio</Label>
+
+                            <Textarea
+                                id="bio"
+                                className="mt-1 block w-full"
+                                value={
+                                    typeof data.bio === 'string' ? data.bio : ''
+                                }
+                                onChange={(e) => setData('bio', e.target.value)}
+                                placeholder="Ceritakan sedikit tentang Anda..."
+                                rows={4}
+                            />
+
+                            <InputError className="mt-2" message={errors.bio} />
                         </div>
 
                         {mustVerifyEmail &&

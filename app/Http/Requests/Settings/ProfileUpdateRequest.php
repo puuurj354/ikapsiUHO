@@ -28,6 +28,12 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
 
+            'angkatan' => ['nullable', 'string', 'digits:4', 'integer', 'min:2000', 'max:'.(date('Y') + 1)],
+
+            'profesi' => ['nullable', 'string', 'max:255'],
+
+            'bio' => ['nullable', 'string', 'max:500'],
+
             'profile_picture' => ['nullable', 'image', 'mimes:jpeg,jpg,png,gif', 'max:2048'],
         ];
     }
