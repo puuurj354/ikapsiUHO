@@ -1,5 +1,5 @@
-# Multi-stage build for Laravel + Inertia.js + React
-# Build stage is optional - we'll copy pre-built assets
+# Production Laravel + Inertia.js + React Application
+# Build assets locally before deploying: bun run build
 FROM php:8.3-apache
 
 # Set working directory
@@ -35,7 +35,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Enable Apache modules
 RUN a2enmod rewrite headers
 
-# Copy application code
+# Copy application code (including pre-built assets)
 COPY --chown=www-data:www-data . /var/www/html
 
 # Install PHP dependencies

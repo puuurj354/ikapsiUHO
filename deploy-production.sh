@@ -9,6 +9,24 @@ echo "  iKAPSI UHO Production Deployment"
 echo "======================================"
 echo ""
 
+# Build assets locally first
+echo "🔨 Step 0: Building frontend assets locally..."
+if ! command -v bun &> /dev/null; then
+    echo "❌ Error: Bun is not installed!"
+    echo "   Please install Bun: curl -fsSL https://bun.sh/install | bash"
+    exit 1
+fi
+
+bun run build
+
+if [ ! -f "public/build/manifest.json" ]; then
+    echo "❌ Error: Build failed! Missing public/build/manifest.json"
+    exit 1
+fi
+
+echo "✅ Assets built successfully"
+echo ""
+
 # Check if there are uncommitted changes
 if [[ -n $(git status -s) ]]; then
     echo "⚠️  Warning: You have uncommitted changes!"
@@ -48,18 +66,33 @@ git fetch origin main
 echo "  → Pulling changes..."
 git pull origin main
 
-echo "  → Checking for dependency changes..."
+echo "  → Checking for changes..."
 COMPOSER_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "composer.lock" || true)
-PACKAGE_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "package.json\|bun.lockb" || true)
+PROVIDER_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "app/Providers\|app/Observers" || true)
+DOCKER_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "Dockerfile\|docker-compose.yml\|docker-entrypoint.sh" || true)
 
-if [ "$COMPOSER_CHANGED" -gt 0 ]; then
-    echo "  → Installing PHP dependencies..."
-    docker-compose exec -T ikapsi-app composer install --no-dev --optimize-autoloader --no-interaction
+# Determine if we need to rebuild the container
+NEEDS_REBUILD=false
+
+if [ "$PROVIDER_CHANGED" -gt 0 ]; then
+    echo "  ⚠️  Provider/Observer changes detected - container rebuild required"
+    NEEDS_REBUILD=true
 fi
 
-if [ "$PACKAGE_CHANGED" -gt 0 ]; then
-    echo "  → Installing JS dependencies and building..."
-    docker-compose exec -T ikapsi-app bash -c 'export BUN_INSTALL="$HOME/.bun" && export PATH="$BUN_INSTALL/bin:$PATH" && bun install && bun run build'
+if [ "$DOCKER_CHANGED" -gt 0 ]; then
+    echo "  ⚠️  Docker configuration changed - container rebuild required"
+    NEEDS_REBUILD=true
+fi
+
+if [ "$NEEDS_REBUILD" = true ]; then
+    echo "  → Rebuilding containers..."
+    docker-compose down
+    docker-compose up -d --build
+    echo "  → Waiting for container to be ready..."
+    sleep 15
+elif [ "$COMPOSER_CHANGED" -gt 0 ]; then
+    echo "  → Installing PHP dependencies..."
+    docker-compose exec -T ikapsi-app composer install --no-dev --optimize-autoloader --no-interaction
 fi
 
 echo "  → Running migrations..."
@@ -79,16 +112,8 @@ docker-compose exec -T ikapsi-app php artisan view:cache
 echo "  → Gracefully restarting application..."
 docker-compose exec -T ikapsi-app php artisan queue:restart 2>/dev/null || true
 
-# Check if critical files changed that require container rebuild
-CODE_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "app/Providers\|app/Observers\|Dockerfile\|docker-compose.yml\|docker-entrypoint.sh" || true)
-
-if [ "$CODE_CHANGED" -gt 0 ]; then
-    echo "  → Critical code changes detected, rebuilding container..."
-    docker-compose down
-    docker-compose up -d --build
-    echo "  → Waiting for container to be ready..."
-    sleep 10
-else
+# Only restart if we didn't rebuild
+if [ "$NEEDS_REBUILD" = false ]; then
     echo "  → Restarting container..."
     docker-compose restart ikapsi-app
     sleep 5
