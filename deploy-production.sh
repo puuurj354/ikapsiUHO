@@ -1,6 +1,6 @@
 #!/bin/bash
 # Deployment Script untuk iKAPSI UHO Production
-# Usage: ./deploy-production.sh
+# Usage: ./deploy-production.sh [--rebuild]
 #
 # Script ini akan otomatis:
 # - Build frontend assets (Vite)
@@ -11,9 +11,19 @@
 # - Clear & rebuild cache
 # - Restart aplikasi
 #
+# Options:
+#   --rebuild    Force rebuild Docker image (gunakan saat ada perubahan code/controller)
+#
 # Queue Worker & Scheduler akan otomatis jalan dengan Supervisor
 
 set -e
+
+# Parse arguments
+FORCE_REBUILD=false
+if [[ "$1" == "--rebuild" ]]; then
+    FORCE_REBUILD=true
+    echo "🔄 Force rebuild mode enabled"
+fi
 
 echo "======================================"
 echo "  iKAPSI UHO Production Deployment"
@@ -72,7 +82,7 @@ git push origin main
 
 # 2. SSH ke VPS dan deploy
 echo "🚀 Step 2: Deploying to production server..."
-ssh admin@147.93.81.147 << 'ENDSSH'
+ssh admin@147.93.81.147 << ENDSSH
 set -e  # Exit on error
 
 cd ~/Documents/ikapsiUHO
@@ -92,30 +102,36 @@ echo "  → Pulling changes..."
 git pull origin main
 
 echo "  → Checking for changes..."
-COMPOSER_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "composer.lock" || true)
-PROVIDER_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "app/Providers\|app/Observers" || true)
-DOCKER_CHANGED=$(git diff HEAD@{1} --name-only | grep -c "Dockerfile\|docker-compose.yml\|docker-entrypoint.sh" || true)
+COMPOSER_CHANGED=\$(git diff HEAD@{1} --name-only | grep -c "composer.lock" || true)
+PROVIDER_CHANGED=\$(git diff HEAD@{1} --name-only | grep -c "app/Providers\|app/Observers" || true)
+DOCKER_CHANGED=\$(git diff HEAD@{1} --name-only | grep -c "Dockerfile\|docker-compose.yml\|docker-entrypoint.sh\|supervisord.conf" || true)
 
 # Determine if we need to rebuild the container
 NEEDS_REBUILD=false
+FORCE_REBUILD=$FORCE_REBUILD
 
-if [ "$PROVIDER_CHANGED" -gt 0 ]; then
+if [ "\$FORCE_REBUILD" = true ]; then
+    echo "  🔄 Force rebuild requested"
+    NEEDS_REBUILD=true
+fi
+
+if [ "\$PROVIDER_CHANGED" -gt 0 ]; then
     echo "  ⚠️  Provider/Observer changes detected - container rebuild required"
     NEEDS_REBUILD=true
 fi
 
-if [ "$DOCKER_CHANGED" -gt 0 ]; then
+if [ "\$DOCKER_CHANGED" -gt 0 ]; then
     echo "  ⚠️  Docker configuration changed - container rebuild required"
     NEEDS_REBUILD=true
 fi
 
-if [ "$NEEDS_REBUILD" = true ]; then
+if [ "\$NEEDS_REBUILD" = true ]; then
     echo "  → Rebuilding containers..."
     docker-compose down
-    docker-compose up -d --build
+    docker-compose up -d --build --force-recreate
     echo "  → Waiting for container to be ready..."
     sleep 15
-elif [ "$COMPOSER_CHANGED" -gt 0 ]; then
+elif [ "\$COMPOSER_CHANGED" -gt 0 ]; then
     echo "  → Installing PHP dependencies..."
     docker-compose exec -T ikapsi-app composer install --no-dev --optimize-autoloader --no-interaction
 fi
@@ -185,7 +201,15 @@ echo ""
 echo "🌐 Website: https://ikapsi.horus.my.id"
 echo "👤 Admin: admin@ikapsiuho.id / password"
 echo ""
-echo "📋 Quick Check (Opsional):"
+echo "� Tips:"
+echo ""
+echo "  Deployment cepat (tanpa rebuild Docker):"
+echo "  ./deploy-production.sh"
+echo ""
+echo "  Deployment dengan rebuild (untuk perubahan code/controller):"
+echo "  ./deploy-production.sh --rebuild"
+echo ""
+echo "�📋 Quick Check (Opsional):"
 echo ""
 echo "  Cek status queue worker & scheduler:"
 echo "  ssh admin@147.93.81.147"
