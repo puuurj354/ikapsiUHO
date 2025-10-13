@@ -71,7 +71,7 @@ class UserManagementController extends Controller
 
         // Convert role ke lowercase (enum format)
         $validated['role'] = strtolower($validated['role']);
-        
+
         $validated['password'] = Hash::make($validated['password']);
         $validated['email_verified_at'] = now();
 

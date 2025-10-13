@@ -228,11 +228,11 @@ class ForumService
 
         // Kirim notifikasi ke user yang berbeda
         $notifiedUsers = collect([Auth::id()]); // Jangan notif diri sendiri
-        
+
         // 1. Jika ini adalah nested reply (membalas komentar lain)
         if ($validated['parent_id']) {
             $parentReply = ForumReply::find($validated['parent_id']);
-            
+
             if ($parentReply && !$notifiedUsers->contains($parentReply->user_id)) {
                 $parentReply->user->notify(
                     new ForumReplyNotification($reply, $discussion, Auth::user())
@@ -240,7 +240,7 @@ class ForumService
                 $notifiedUsers->push($parentReply->user_id);
             }
         }
-        
+
         // 2. Notifikasi ke pemilik diskusi (jika belum dinotif)
         if (!$notifiedUsers->contains($discussion->user_id)) {
             $discussion->user->notify(
