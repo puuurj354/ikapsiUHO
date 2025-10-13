@@ -37,6 +37,12 @@ git log -1 --oneline
 echo ""
 echo "  → Rolling back to: $ROLLBACK_TO"
 git fetch origin main
+
+# Fix permission sebelum reset
+echo "  → Fixing storage permissions..."
+sudo chown -R admin:admin storage/
+sudo chmod -R 775 storage/
+
 git reset --hard $ROLLBACK_TO
 
 echo "  → Clearing all caches..."
