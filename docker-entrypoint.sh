@@ -56,6 +56,12 @@ echo "🔒 Setting permissions..."
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Create log files for supervisor processes
+touch /var/www/html/storage/logs/queue-worker.log
+touch /var/www/html/storage/logs/scheduler.log
+chown www-data:www-data /var/www/html/storage/logs/queue-worker.log
+chown www-data:www-data /var/www/html/storage/logs/scheduler.log
+
 # Run seeders if specified
 if [ "$RUN_SEEDERS" = "true" ]; then
     echo "🌱 Running database seeders..."

@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     default-mysql-client \
+    supervisor \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -76,6 +77,13 @@ RUN echo '<VirtualHost *:80>\n\
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Copy supervisor configuration
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create supervisor log directory
+RUN mkdir -p /var/log/supervisor && \
+    chown -R www-data:www-data /var/log/supervisor
+
 # Expose port 80
 EXPOSE 80
 
@@ -86,5 +94,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Use custom entrypoint
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Start Supervisor (which will start Apache, Queue Worker, and Scheduler)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

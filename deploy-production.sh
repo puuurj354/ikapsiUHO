@@ -1,6 +1,17 @@
 #!/bin/bash
 # Deployment Script untuk iKAPSI UHO Production
 # Usage: ./deploy-production.sh
+#
+# Script ini akan otomatis:
+# - Build frontend assets (Vite)
+# - Push ke GitHub
+# - Deploy ke VPS dengan Docker
+# - Jalankan migrasi database
+# - Generate routes (Wayfinder)
+# - Clear & rebuild cache
+# - Restart aplikasi
+#
+# Queue Worker & Scheduler akan otomatis jalan dengan Supervisor
 
 set -e
 
@@ -159,4 +170,19 @@ echo "======================================"
 echo ""
 echo "🌐 Website: https://ikapsi.horus.my.id"
 echo "👤 Admin: admin@ikapsiuho.id / password"
+echo ""
+echo "📋 Quick Check (Opsional):"
+echo ""
+echo "  Cek status queue worker & scheduler:"
+echo "  ssh admin@147.93.81.147"
+echo "  cd ~/Documents/ikapsiUHO"
+echo "  docker-compose exec ikapsi-app supervisorctl status"
+echo ""
+echo "  Expected output:"
+echo "  apache2                    RUNNING"
+echo "  laravel-queue-worker:00    RUNNING"
+echo "  laravel-queue-worker:01    RUNNING"
+echo "  laravel-scheduler          RUNNING"
+echo ""
+echo "✅ Queue worker & scheduler berjalan otomatis dengan Supervisor"
 echo ""
