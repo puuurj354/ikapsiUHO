@@ -44,15 +44,29 @@ if [[ -n $(git status -s) ]]; then
     echo ""
     git status -s
     echo ""
-    read -p "Do you want to commit them first? (y/n) " -n 1 -r
+    read -p "Do you want to commit and push them now? (y/n) " -n 1 -r
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Please commit your changes first, then run this script again."
+        echo ""
+        read -p "Enter commit message: " COMMIT_MSG
+        if [[ -z "$COMMIT_MSG" ]]; then
+            COMMIT_MSG="Deploy: Update application and build assets"
+        fi
+        echo ""
+        echo "📝 Committing changes..."
+        git add .
+        git commit -m "$COMMIT_MSG"
+        echo "✅ Changes committed"
+    else
+        echo ""
+        echo "❌ Deployment cancelled. Please commit your changes first."
+        echo "   Run: git add . && git commit -m 'your message'"
         exit 1
     fi
 fi
 
 # 1. Push ke GitHub
+echo ""
 echo "📤 Step 1: Pushing changes to GitHub..."
 git push origin main
 
