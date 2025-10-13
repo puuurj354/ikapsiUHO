@@ -62,13 +62,16 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', Password::defaults()],
-            'role' => 'required|in:admin,alumni',
+            'role' => 'required|in:ADMIN,ALUMNI,admin,alumni', // Support both uppercase dan lowercase
             'angkatan' => 'nullable|string|max:4',
             'profesi' => 'nullable|string|max:255',
             'bio' => 'nullable|string|max:1000',
             'profile_picture' => 'nullable|image|max:2048',
         ]);
 
+        // Convert role ke lowercase (enum format)
+        $validated['role'] = strtolower($validated['role']);
+        
         $validated['password'] = Hash::make($validated['password']);
         $validated['email_verified_at'] = now();
 
@@ -90,12 +93,15 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => ['nullable', Password::defaults()],
-            'role' => 'required|in:admin,alumni',
+            'role' => 'required|in:ADMIN,ALUMNI,admin,alumni', // Support both uppercase dan lowercase
             'angkatan' => 'nullable|string|max:4',
             'profesi' => 'nullable|string|max:255',
             'bio' => 'nullable|string|max:1000',
             'profile_picture' => 'nullable|image|max:2048',
         ]);
+
+        // Convert role ke lowercase (enum format)
+        $validated['role'] = strtolower($validated['role']);
 
         if ($request->filled('password')) {
             $validated['password'] = Hash::make($validated['password']);
