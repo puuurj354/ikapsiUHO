@@ -184,9 +184,9 @@ export function NotificationBell({ className }: NotificationBellProps) {
         }
     };
 
-    const handleNotificationClick = (notification: Notification) => {
+    const handleNotificationClick = async (notification: Notification) => {
         if (!notification.read_at) {
-            markAsRead(notification.id);
+            await markAsRead(notification.id);
         }
         router.visit(notification.data.action_url);
         setIsOpen(false);

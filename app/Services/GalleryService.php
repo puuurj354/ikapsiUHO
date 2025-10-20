@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
+use App\Enums\Role;
 use App\Models\Gallery;
+use App\Models\User;
+use App\Notifications\GalleryStatusChangedNotification;
+use App\Notifications\GallerySubmittedNotification;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 class GalleryService
@@ -137,6 +141,14 @@ class GalleryService
                 'approved_at' => now(),
                 'approved_by' => Auth::id(),
             ]);
+        } else {
+            // If public type, notify all admins
+            $admins = User::where('role', Role::ADMIN)->get();
+            $uploader = Auth::user();
+
+            foreach ($admins as $admin) {
+                $admin->notify(new GallerySubmittedNotification($gallery, $uploader));
+            }
         }
 
         return $gallery;
@@ -196,6 +208,12 @@ class GalleryService
             'rejection_reason' => null,
         ]);
 
+        // Notify the gallery owner
+        $admin = Auth::user();
+        $gallery->user->notify(
+            new GalleryStatusChangedNotification($gallery, $admin, 'approved')
+        );
+
         return $gallery->fresh();
     }
 
@@ -210,6 +228,12 @@ class GalleryService
             'approved_at' => null,
             'approved_by' => null,
         ]);
+
+        // Notify the gallery owner
+        $admin = Auth::user();
+        $gallery->user->notify(
+            new GalleryStatusChangedNotification($gallery, $admin, 'rejected', $reason)
+        );
 
         return $gallery->fresh();
     }
