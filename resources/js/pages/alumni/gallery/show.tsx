@@ -197,9 +197,9 @@ export default function AlumniGalleryShow({ gallery }: Props) {
                                     Menunggu Persetujuan
                                 </h3>
                                 <p className="text-sm text-yellow-800">
-                                    Galeri Anda sedang ditinjau oleh admin. Anda akan
-                                    menerima notifikasi ketika galeri disetujui atau
-                                    ditolak.
+                                    Galeri Anda sedang ditinjau oleh admin. Anda
+                                    akan menerima notifikasi ketika galeri
+                                    disetujui atau ditolak.
                                 </p>
                             </div>
                         </div>
@@ -221,8 +221,8 @@ export default function AlumniGalleryShow({ gallery }: Props) {
                                     {gallery.rejection_reason}
                                 </p>
                                 <p className="mt-2 text-sm text-red-800">
-                                    Anda dapat mengedit dan mengunggah ulang galeri
-                                    ini.
+                                    Anda dapat mengedit dan mengunggah ulang
+                                    galeri ini.
                                 </p>
                             </div>
                         </div>
@@ -277,7 +277,7 @@ export default function AlumniGalleryShow({ gallery }: Props) {
                                         <p className="text-sm font-medium text-muted-foreground">
                                             Deskripsi
                                         </p>
-                                        <p className="mt-1 whitespace-pre-wrap text-sm">
+                                        <p className="mt-1 text-sm whitespace-pre-wrap">
                                             {gallery.description}
                                         </p>
                                     </div>
@@ -328,7 +328,9 @@ export default function AlumniGalleryShow({ gallery }: Props) {
                                         <div className="mt-1 flex items-center gap-2">
                                             <CheckCircle2 className="h-4 w-4 text-green-600" />
                                             <span className="text-sm">
-                                                {formatDate(gallery.approved_at)}
+                                                {formatDate(
+                                                    gallery.approved_at,
+                                                )}
                                             </span>
                                         </div>
                                     </div>
@@ -352,7 +354,9 @@ export default function AlumniGalleryShow({ gallery }: Props) {
                                     className="w-full"
                                     variant="outline"
                                     onClick={() =>
-                                        router.visit(`/gallery/${gallery.id}/edit`)
+                                        router.visit(
+                                            `/gallery/${gallery.id}/edit`,
+                                        )
                                     }
                                 >
                                     <Pencil className="mr-2 h-4 w-4" />
@@ -379,7 +383,9 @@ export default function AlumniGalleryShow({ gallery }: Props) {
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                                         {gallery.user.profile_picture ? (
                                             <img
-                                                src={gallery.user.profile_picture}
+                                                src={
+                                                    gallery.user.profile_picture
+                                                }
                                                 alt={gallery.user.name}
                                                 className="h-12 w-12 rounded-full object-cover"
                                             />
@@ -419,25 +425,27 @@ export default function AlumniGalleryShow({ gallery }: Props) {
                         )}
 
                         {/* Help Card */}
-                        {gallery.type === 'public' && gallery.status === 'pending' && (
-                            <Card className="border-blue-200 bg-blue-50">
-                                <CardContent className="p-4">
-                                    <div className="flex gap-3">
-                                        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
-                                        <div>
-                                            <h3 className="mb-1 font-semibold text-blue-900">
-                                                Proses Review
-                                            </h3>
-                                            <p className="text-sm text-blue-800">
-                                                Galeri publik Anda sedang ditinjau oleh
-                                                admin. Proses ini biasanya memakan waktu
-                                                1-2 hari kerja.
-                                            </p>
+                        {gallery.type === 'public' &&
+                            gallery.status === 'pending' && (
+                                <Card className="border-blue-200 bg-blue-50">
+                                    <CardContent className="p-4">
+                                        <div className="flex gap-3">
+                                            <Clock className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+                                            <div>
+                                                <h3 className="mb-1 font-semibold text-blue-900">
+                                                    Proses Review
+                                                </h3>
+                                                <p className="text-sm text-blue-800">
+                                                    Galeri publik Anda sedang
+                                                    ditinjau oleh admin. Proses
+                                                    ini biasanya memakan waktu
+                                                    1-2 hari kerja.
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
+                                    </CardContent>
+                                </Card>
+                            )}
                     </div>
                 </div>
             </div>

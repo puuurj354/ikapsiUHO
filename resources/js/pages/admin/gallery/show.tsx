@@ -205,25 +205,26 @@ export default function AdminGalleryShow({ gallery }: Props) {
                     </div>
 
                     {/* Action Buttons */}
-                    {gallery.type === 'public' && gallery.status === 'pending' && (
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                                onClick={() => setIsRejectDialogOpen(true)}
-                            >
-                                <XCircle className="mr-2 h-4 w-4" />
-                                Tolak
-                            </Button>
-                            <Button
-                                className="bg-green-600 hover:bg-green-700"
-                                onClick={handleApprove}
-                            >
-                                <CheckCircle2 className="mr-2 h-4 w-4" />
-                                Setujui
-                            </Button>
-                        </div>
-                    )}
+                    {gallery.type === 'public' &&
+                        gallery.status === 'pending' && (
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                    onClick={() => setIsRejectDialogOpen(true)}
+                                >
+                                    <XCircle className="mr-2 h-4 w-4" />
+                                    Tolak
+                                </Button>
+                                <Button
+                                    className="bg-green-600 hover:bg-green-700"
+                                    onClick={handleApprove}
+                                >
+                                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                                    Setujui
+                                </Button>
+                            </div>
+                        )}
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-3">
@@ -273,7 +274,7 @@ export default function AdminGalleryShow({ gallery }: Props) {
                                         <p className="text-sm font-medium text-muted-foreground">
                                             Deskripsi
                                         </p>
-                                        <p className="mt-1 whitespace-pre-wrap text-sm">
+                                        <p className="mt-1 text-sm whitespace-pre-wrap">
                                             {gallery.description}
                                         </p>
                                     </div>
@@ -324,7 +325,9 @@ export default function AdminGalleryShow({ gallery }: Props) {
                                         <div className="mt-1 flex items-center gap-2">
                                             <CheckCircle2 className="h-4 w-4 text-green-600" />
                                             <span className="text-sm">
-                                                {formatDate(gallery.approved_at)}
+                                                {formatDate(
+                                                    gallery.approved_at,
+                                                )}
                                             </span>
                                         </div>
                                     </div>
@@ -357,7 +360,9 @@ export default function AdminGalleryShow({ gallery }: Props) {
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                                         {gallery.user.profile_picture ? (
                                             <img
-                                                src={gallery.user.profile_picture}
+                                                src={
+                                                    gallery.user.profile_picture
+                                                }
                                                 alt={gallery.user.name}
                                                 className="h-12 w-12 rounded-full object-cover"
                                             />
