@@ -21,6 +21,7 @@ import {
     FileText,
     Folder,
     Home,
+    Image,
     LayoutGrid,
     MessageSquare,
     Tag,
@@ -68,6 +69,11 @@ export function AppSidebar() {
                   icon: Calendar,
               },
               {
+                  title: 'Manajemen Galeri',
+                  href: '/admin/gallery',
+                  icon: Image,
+              },
+              {
                   title: 'Kategori Artikel',
                   href: '/admin/articles/categories',
                   icon: Tag,
@@ -113,6 +119,11 @@ export function AppSidebar() {
                   title: 'Artikel Saya',
                   href: '/articles/my-articles',
                   icon: FileText,
+              },
+              {
+                  title: 'Galeri Saya',
+                  href: '/gallery',
+                  icon: Image,
               },
               {
                   title: 'Forum Diskusi',

@@ -80,8 +80,21 @@ export default function Welcome({ featuredArticles }: WelcomeProps) {
 
                         {/* Navigation */}
                         <nav className="flex items-center gap-2 lg:gap-4">
-                            {/* Theme Toggle Button */}
-                            <ThemeToggle />
+                            {/* Public Gallery Link */}
+                            <Link
+                                href="/galleries"
+                                className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                            >
+                                Galeri
+                            </Link>
+
+                            {/* Articles Link */}
+                            <Link
+                                href="/articles"
+                                className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                            >
+                                Artikel
+                            </Link>
 
                             {auth.user ? (
                                 <Link
@@ -110,6 +123,9 @@ export default function Welcome({ featuredArticles }: WelcomeProps) {
                                     </Link>
                                 </>
                             )}
+
+                            {/* Theme Toggle Button */}
+                            <ThemeToggle />
                         </nav>
                     </div>
                 </header>

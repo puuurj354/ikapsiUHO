@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ArticleCategoryController;
 use App\Http\Controllers\Admin\EventManagementController as AdminEventController;
 use App\Http\Controllers\Admin\ForumCategoryController;
+use App\Http\Controllers\Admin\GalleryManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AlumniDashboardController;
@@ -11,8 +12,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ForumReportController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicArticleController;
+use App\Http\Controllers\PublicGalleryController;
 use App\Services\ArticleService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -87,12 +90,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
+
+    // Gallery routes - authenticated users can manage their galleries
+    Route::prefix('gallery')->name('gallery.')->group(function () {
+        Route::get('/', [GalleryController::class, 'index'])->name('index');
+        Route::get('create', [GalleryController::class, 'create'])->name('create');
+        Route::post('/', [GalleryController::class, 'store'])->name('store');
+        Route::get('{gallery}', [GalleryController::class, 'show'])->name('show');
+        Route::get('{gallery}/edit', [GalleryController::class, 'edit'])->name('edit');
+        Route::patch('{gallery}', [GalleryController::class, 'update'])->name('update');
+        Route::delete('{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Public article routes (must be after authenticated routes to avoid conflicts)
 Route::prefix('articles')->name('articles.')->group(function () {
     Route::get('/', [PublicArticleController::class, 'index'])->name('public.index');
     Route::get('{slug}', [PublicArticleController::class, 'show'])->name('public.show');
+});
+
+// Public gallery routes (must be after authenticated routes to avoid conflicts)
+Route::prefix('galleries')->name('galleries.')->group(function () {
+    Route::get('/', [PublicGalleryController::class, 'index'])->name('public.index');
+    Route::get('{gallery}', [PublicGalleryController::class, 'show'])->name('public.show');
 });
 
 // Admin routes - protected by admin middleware
@@ -139,6 +159,16 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::patch('{category}', [ArticleCategoryController::class, 'update'])->name('update');
         Route::delete('{category}', [ArticleCategoryController::class, 'destroy'])->name('destroy');
         Route::post('{category}/toggle-active', [ArticleCategoryController::class, 'toggleActive'])->name('toggle-active');
+    });
+
+    // Gallery Management
+    Route::prefix('gallery')->name('gallery.')->group(function () {
+        Route::get('/', [GalleryManagementController::class, 'index'])->name('index');
+        Route::get('{gallery}', [GalleryManagementController::class, 'show'])->name('show');
+        Route::post('{gallery}/approve', [GalleryManagementController::class, 'approve'])->name('approve');
+        Route::post('{gallery}/reject', [GalleryManagementController::class, 'reject'])->name('reject');
+        Route::delete('{gallery}', [GalleryManagementController::class, 'destroy'])->name('destroy');
+        Route::post('{gallery}/restore', [GalleryManagementController::class, 'restore'])->name('restore');
     });
 
     // Admin can delete any article
