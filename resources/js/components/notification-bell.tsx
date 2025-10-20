@@ -329,11 +329,13 @@ export function NotificationBell({ className }: NotificationBellProps) {
                                                                     .type ===
                                                                 'forum_like'
                                                               ? 'bg-red-100'
-                                                              : notification.data
+                                                              : notification
+                                                                      .data
                                                                       .type ===
                                                                   'gallery_submitted'
                                                                 ? 'bg-purple-100'
-                                                                : notification.data
+                                                                : notification
+                                                                        .data
                                                                         .type ===
                                                                     'gallery_status_changed'
                                                                   ? 'bg-green-100'
