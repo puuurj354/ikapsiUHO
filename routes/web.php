@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ArticleCategoryController;
 use App\Http\Controllers\Admin\EventManagementController as AdminEventController;
 use App\Http\Controllers\Admin\ForumCategoryController;
+use App\Http\Controllers\Admin\GalleryBatchController;
 use App\Http\Controllers\Admin\GalleryManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AdminDashboardController;
@@ -81,6 +82,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('{article}/toggle-publish', [ArticleController::class, 'togglePublish'])->name('toggle-publish');
     });
 
+    Route::get('test-simple', fn() => 'test')->name('test.simple');
+
+    // Gallery routes - authenticated users can manage their gallery
+    Route::prefix('gallery')->name('gallery.')->group(function () {
+        Route::get('/', [GalleryController::class, 'index'])->name('index');
+        Route::get('create', [GalleryController::class, 'create'])->name('create');
+        Route::post('/', [GalleryController::class, 'store'])->name('store');
+        Route::get('{image}/edit', [GalleryController::class, 'edit'])->name('edit');
+        Route::patch('{image}', [GalleryController::class, 'update'])->name('update');
+        Route::delete('{image}', [GalleryController::class, 'destroy'])->name('destroy');
+    });
+
     // Notification routes
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
@@ -90,17 +103,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
-
-    // Gallery routes - authenticated users can manage their galleries
-    Route::prefix('gallery')->name('gallery.')->group(function () {
-        Route::get('/', [GalleryController::class, 'index'])->name('index');
-        Route::get('create', [GalleryController::class, 'create'])->name('create');
-        Route::post('/', [GalleryController::class, 'store'])->name('store');
-        Route::get('{gallery}', [GalleryController::class, 'show'])->name('show');
-        Route::get('{gallery}/edit', [GalleryController::class, 'edit'])->name('edit');
-        Route::patch('{gallery}', [GalleryController::class, 'update'])->name('update');
-        Route::delete('{gallery}', [GalleryController::class, 'destroy'])->name('destroy');
-    });
 });
 
 // Public article routes (must be after authenticated routes to avoid conflicts)
@@ -109,10 +111,10 @@ Route::prefix('articles')->name('articles.')->group(function () {
     Route::get('{slug}', [PublicArticleController::class, 'show'])->name('public.show');
 });
 
-// Public gallery routes (must be after authenticated routes to avoid conflicts)
-Route::prefix('galleries')->name('galleries.')->group(function () {
+// Public gallery routes
+Route::prefix('gallery')->name('gallery.')->group(function () {
     Route::get('/', [PublicGalleryController::class, 'index'])->name('public.index');
-    Route::get('{gallery}', [PublicGalleryController::class, 'show'])->name('public.show');
+    Route::get('batch/{batch}', [PublicGalleryController::class, 'batch'])->name('public.batch');
 });
 
 // Admin routes - protected by admin middleware
@@ -161,18 +163,25 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::post('{category}/toggle-active', [ArticleCategoryController::class, 'toggleActive'])->name('toggle-active');
     });
 
+    // Admin can delete any article
+    Route::delete('articles/{article}/force-delete', [ArticleController::class, 'destroy'])->name('articles.force-delete');
+
     // Gallery Management
     Route::prefix('gallery')->name('gallery.')->group(function () {
         Route::get('/', [GalleryManagementController::class, 'index'])->name('index');
-        Route::get('{gallery}', [GalleryManagementController::class, 'show'])->name('show');
-        Route::post('{gallery}/approve', [GalleryManagementController::class, 'approve'])->name('approve');
-        Route::post('{gallery}/reject', [GalleryManagementController::class, 'reject'])->name('reject');
-        Route::delete('{gallery}', [GalleryManagementController::class, 'destroy'])->name('destroy');
-        Route::post('{gallery}/restore', [GalleryManagementController::class, 'restore'])->name('restore');
-    });
+        Route::post('{image}/approve', [GalleryManagementController::class, 'approve'])->name('approve');
+        Route::post('{image}/reject', [GalleryManagementController::class, 'reject'])->name('reject');
+        Route::delete('{image}', [GalleryManagementController::class, 'destroy'])->name('destroy');
 
-    // Admin can delete any article
-    Route::delete('articles/{article}/force-delete', [ArticleController::class, 'destroy'])->name('articles.force-delete');
+        // Batch Management
+        Route::prefix('batches')->name('batches.')->group(function () {
+            Route::get('/', [GalleryBatchController::class, 'index'])->name('index');
+            Route::post('/', [GalleryBatchController::class, 'store'])->name('store');
+            Route::patch('{batch}', [GalleryBatchController::class, 'update'])->name('update');
+            Route::delete('{batch}', [GalleryBatchController::class, 'destroy'])->name('destroy');
+            Route::post('{batch}/toggle-active', [GalleryBatchController::class, 'toggleActive'])->name('toggle-active');
+        });
+    });
 });
 
 require __DIR__.'/settings.php';
