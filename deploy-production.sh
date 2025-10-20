@@ -148,6 +148,10 @@ docker-compose exec -T ikapsi-app php artisan config:clear
 docker-compose exec -T ikapsi-app php artisan route:clear
 docker-compose exec -T ikapsi-app php artisan view:clear
 
+echo "  → Syncing frontend build files to container..."
+docker cp public/build ikapsi-app:/var/www/html/public/
+docker-compose exec -T ikapsi-app chown -R www-data:www-data /var/www/html/public/build
+
 echo "  → Rebuilding optimized caches..."
 docker-compose exec -T ikapsi-app php artisan config:cache
 docker-compose exec -T ikapsi-app php artisan route:cache
