@@ -35,6 +35,22 @@ interface Notification {
         message: string;
         action_url: string;
         icon: string;
+        uploader?: {
+            id: number;
+            name: string;
+            profile_picture_url: string | null;
+            angkatan: string;
+        };
+        gallery?: {
+            id: number;
+            title: string;
+            batch: string;
+            image_url: string;
+        };
+        admin?: {
+            id: number;
+            name: string;
+        };
     };
     read_at: string | null;
     created_at: string;
@@ -272,6 +288,12 @@ export function NotificationBell({ className }: NotificationBellProps) {
                                     notification.data.icon,
                                 );
 
+                                // Determine what image to show (priority: gallery > uploader profile)
+                                const displayImage =
+                                    notification.data.gallery?.image_url ||
+                                    notification.data.uploader
+                                        ?.profile_picture_url;
+
                                 return (
                                     <DropdownMenuItem
                                         key={notification.id}
@@ -287,32 +309,63 @@ export function NotificationBell({ className }: NotificationBellProps) {
                                         }
                                     >
                                         <div className="flex w-full items-start gap-3">
-                                            <div
-                                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
-                                                    notification.data.type ===
-                                                    'forum_reply'
-                                                        ? 'bg-blue-100'
-                                                        : notification.data
-                                                                .type ===
-                                                            'forum_like'
-                                                          ? 'bg-red-100'
-                                                          : 'bg-purple-100'
-                                                }`}
-                                            >
-                                                <IconComponent
-                                                    className={`h-5 w-5 ${
+                                            {/* Avatar/Image */}
+                                            {displayImage ? (
+                                                <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
+                                                    <img
+                                                        src={displayImage}
+                                                        alt=""
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
                                                         notification.data
                                                             .type ===
                                                         'forum_reply'
-                                                            ? 'text-blue-600'
+                                                            ? 'bg-blue-100'
                                                             : notification.data
                                                                     .type ===
                                                                 'forum_like'
-                                                              ? 'text-red-600'
-                                                              : 'text-purple-600'
+                                                              ? 'bg-red-100'
+                                                              : notification.data
+                                                                      .type ===
+                                                                  'gallery_submitted'
+                                                                ? 'bg-purple-100'
+                                                                : notification.data
+                                                                        .type ===
+                                                                    'gallery_status_changed'
+                                                                  ? 'bg-green-100'
+                                                                  : 'bg-purple-100'
                                                     }`}
-                                                />
-                                            </div>
+                                                >
+                                                    <IconComponent
+                                                        className={`h-5 w-5 ${
+                                                            notification.data
+                                                                .type ===
+                                                            'forum_reply'
+                                                                ? 'text-blue-600'
+                                                                : notification
+                                                                        .data
+                                                                        .type ===
+                                                                    'forum_like'
+                                                                  ? 'text-red-600'
+                                                                  : notification
+                                                                          .data
+                                                                          .type ===
+                                                                      'gallery_submitted'
+                                                                    ? 'text-purple-600'
+                                                                    : notification
+                                                                            .data
+                                                                            .type ===
+                                                                        'gallery_status_changed'
+                                                                      ? 'text-green-600'
+                                                                      : 'text-purple-600'
+                                                        }`}
+                                                    />
+                                                </div>
+                                            )}
                                             <div className="min-w-0 flex-1 space-y-1">
                                                 <p className="text-sm leading-tight font-medium">
                                                     {notification.data.title}
